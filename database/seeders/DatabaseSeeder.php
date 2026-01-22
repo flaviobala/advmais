@@ -3,23 +3,89 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Group;
+use App\Models\Course;
+use App\Models\Lesson;
+use App\Enums\VideoProvider; // Importante: Usando o Enum que criamos
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // 1. Criar os Grupos (Turmas)
+        $grupoOAB = Group::create([
+            'name' => 'Turma OAB 2026',
+            'slug' => 'turma-oab-2026',
+            'is_active' => true
         ]);
+
+        $grupoVIP = Group::create([
+            'name' => 'Mentoria VIP Advocacia',
+            'slug' => 'mentoria-vip',
+            'is_active' => true
+        ]);
+
+        // 2. Criar Cursos
+        $cursoPenal = Course::create([
+            'title' => 'Direito Penal Avançado',
+            'description' => 'Curso preparatório para segunda fase.',
+        ]);
+
+        $cursoMkt = Course::create([
+            'title' => 'Marketing Jurídico na Prática',
+            'description' => 'Como conseguir clientes sem ferir o código de ética.',
+        ]);
+
+        // 3. Criar Aulas (Lessons)
+        Lesson::create([
+            'course_id' => $cursoPenal->id,
+            'title' => 'Aula 01 - Teoria do Crime',
+            'video_provider' => VideoProvider::YOUTUBE, 
+            'video_ref_id' => 'dQw4w9WgXcQ', // ID de teste do Youtube
+            'order' => 1
+        ]);
+
+        Lesson::create([
+            'course_id' => $cursoMkt->id,
+            'title' => 'Aula 01 - Posicionamento no Instagram',
+            'video_provider' => VideoProvider::VIMEO,
+            'video_ref_id' => '76979871', // ID de teste do Vimeo
+            'order' => 1
+        ]);
+
+        // 4. LIGAR Cursos aos Grupos (A Regra de Ouro)
+        // Turma OAB só vê Penal
+        $grupoOAB->courses()->attach($cursoPenal->id);
+        
+        // Mentoria VIP só vê Marketing
+        $grupoVIP->courses()->attach($cursoMkt->id);
+
+        // 5. Criar Usuários de Teste
+        
+        // Usuário ADMIN (Vê tudo - futuramente)
+        User::create([
+            'name' => 'Admin AdvMais',
+            'email' => 'admin@advmais.local',
+            'password' => Hash::make('12345678'),
+        ]);
+
+        // Aluno OAB (Só deve ver Penal)
+        $alunoOAB = User::create([
+            'name' => 'Dr. João (Aluno OAB)',
+            'email' => 'joao@oab.teste',
+            'password' => Hash::make('12345678'),
+        ]);
+        $alunoOAB->groups()->attach($grupoOAB->id);
+
+        // Aluno VIP (Só deve ver Marketing)
+        $alunoVIP = User::create([
+            'name' => 'Dra. Maria (Aluna VIP)',
+            'email' => 'maria@vip.teste',
+            'password' => Hash::make('12345678'),
+        ]);
+        $alunoVIP->groups()->attach($grupoVIP->id);
+        $this->call(CourseSeeder::class);
     }
 }

@@ -17,10 +17,25 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            
+            // [CUSTOMIZAÇÃO SENIOR]
+            // Enum para controle de acesso simples inicial (RBAC)
+            $table->enum('role', ['admin', 'advogado', 'cliente', 'funcionario'])
+                  ->default('cliente')
+                  ->index(); // Indexado para buscas rápidas
+            
+            // Flag para bloquear acesso sem deletar o usuário
+            $table->boolean('is_active')->default(true);
+            
             $table->rememberToken();
             $table->timestamps();
+            
+            // Soft Deletes: Fundamental em sistemas jurídicos. 
+            // Nunca apagamos o registro fisicamente de imediato.
+            $table->softDeletes();
         });
 
+        // Tabelas de Sessão e Reset de Senha (Padrão Laravel - Mantidas)
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
