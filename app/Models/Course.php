@@ -15,6 +15,11 @@ class Course extends Model
         'title',
         'description',
         'cover_image',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -33,5 +38,34 @@ class Course extends Model
         return $this->belongsToMany(Group::class, 'course_group')
                     ->withPivot('available_at')
                     ->withTimestamps();
+    }
+
+    /**
+     * Scope: Filtra apenas cursos ativos.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Calcula o progresso do usuário neste curso (0-100%).
+     */
+    public function getProgressForUser($userId): int
+    {
+        $totalLessons = $this->lessons()->count();
+
+        if ($totalLessons === 0) {
+            return 0;
+        }
+
+        $completedLessons = $this->lessons()
+            ->whereHas('users', function($query) use ($userId) {
+                $query->where('user_id', $userId)
+                      ->where('is_completed', true);
+            })
+            ->count();
+
+        return (int) round(($completedLessons / $totalLessons) * 100);
     }
 }

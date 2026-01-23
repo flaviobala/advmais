@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\LoginController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\CourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +26,12 @@ Route::middleware('guest')->group(function () {
 
 // --- LOGADOS (AUTH) ---
 Route::middleware('auth')->group(function () {
-    
+
     // Dashboard (Agora usando o Controller correto)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Cursos
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

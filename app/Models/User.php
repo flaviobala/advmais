@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Lesson;
 
 class User extends Authenticatable
 {
@@ -26,6 +27,16 @@ class User extends Authenticatable
     public function groups(): BelongsToMany
     {
         return $this->belongsToMany(Group::class);
+    }
+
+    /**
+     * Relacionamento: Aulas que o usuário assistiu/completou.
+     */
+    public function lessons(): BelongsToMany
+    {
+        return $this->belongsToMany(Lesson::class, 'lesson_user')
+                    ->withPivot('is_completed', 'progress_percentage', 'completed_at')
+                    ->withTimestamps();
     }
 
     // HELPER DE SEGURANÇA: Verifica se o usuário pode ver o curso X
