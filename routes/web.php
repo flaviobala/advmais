@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\LoginController;
+use App\Http\Controllers\Web\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,11 +26,10 @@ Route::middleware('guest')->group(function () {
 // --- LOGADOS (AUTH) ---
 Route::middleware('auth')->group(function () {
     
-    // Dashboard (Apenas uma view simples por enquanto)
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Dashboard (Agora usando o Controller correto)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 });
