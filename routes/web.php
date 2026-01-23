@@ -11,9 +11,14 @@ use App\Http\Controllers\Web\CourseController;
 |--------------------------------------------------------------------------
 */
 
-// Redireciona a raiz para o login
+// Página inicial institucional
 Route::get('/', function () {
-    return redirect()->route('login');
+    // Se já estiver logado, vai direto para o dashboard
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    // Senão, mostra a tela institucional de entrada
+    return view('welcome');
 });
 
 // --- VISITANTES (GUEST) ---
