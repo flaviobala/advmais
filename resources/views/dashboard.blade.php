@@ -21,9 +21,9 @@
                             {{ $course->lessons_count }} Aulas
                         </span>
                         
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                            Assistir Agora &rarr;
-                        </a>
+                       <a href="#" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                                Assistir Agora &rarr;
+                         </a>
                     </div>
                 </div>
             </div>
