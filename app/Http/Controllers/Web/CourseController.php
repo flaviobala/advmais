@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -37,5 +38,25 @@ class CourseController extends Controller
         });
 
         return view('courses.show', compact('course', 'user'));
+    }
+
+    /**
+     * Exibe uma aula específica com o player de vídeo.
+     */
+    public function lesson($courseId, $lessonId)
+    {
+        $user = auth()->user();
+
+        // Verifica se o usuário tem acesso ao curso
+        if (!$user->hasAccessToCourse($courseId)) {
+            abort(403, 'Você não tem permissão para acessar esta aula.');
+        }
+
+        $course = Course::findOrFail($courseId);
+        $lesson = Lesson::where('course_id', $courseId)
+            ->where('id', $lessonId)
+            ->firstOrFail();
+
+        return view('courses.lesson', compact('course', 'lesson'));
     }
 }

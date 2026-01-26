@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
 
     // Cursos
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{courseId}/lessons/{lessonId}', [CourseController::class, 'lesson'])->name('courses.lesson');
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
