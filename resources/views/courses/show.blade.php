@@ -3,10 +3,30 @@
     <!-- Cabeçalho do Curso -->
     <div class="mb-8 bg-white rounded-lg shadow-lg overflow-hidden">
         <div class="md:flex">
-            <!-- Imagem do Curso -->
+            <!-- Vídeo de Apresentação ou Imagem do Curso -->
             <div class="md:w-1/3 bg-gradient-to-br from-blue-400 to-blue-600">
-                @if($course->cover_image)
-                    <img src="{{ $course->cover_image }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                @if($course->preview_video_id)
+                    <div class="w-full aspect-video bg-black">
+                        @if($course->preview_video_provider === 'youtube')
+                            <iframe
+                                class="w-full h-full"
+                                src="https://www.youtube.com/embed/{{ $course->preview_video_id }}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                            </iframe>
+                        @elseif($course->preview_video_provider === 'vimeo')
+                            <iframe
+                                class="w-full h-full"
+                                src="https://player.vimeo.com/video/{{ $course->preview_video_id }}"
+                                frameborder="0"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowfullscreen>
+                            </iframe>
+                        @endif
+                    </div>
+                @elseif($course->cover_image)
+                    <img src="{{ Storage::url($course->cover_image) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                 @else
                     <div class="w-full h-64 flex items-center justify-center">
                         <svg class="w-24 h-24 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +136,7 @@
                                 @endif
 
                                 <!-- Botão Assistir -->
-                                <a href="#" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors duration-200">
+                                <a href="{{ route('courses.lesson', [$course->id, $lesson->id]) }}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors duration-200">
                                     @if($lesson->is_completed)
                                         Rever
                                     @elseif($lesson->progress_percentage > 0)

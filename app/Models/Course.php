@@ -15,6 +15,8 @@ class Course extends Model
         'title',
         'description',
         'cover_image',
+        'preview_video_provider',
+        'preview_video_id',
         'is_active',
     ];
 
