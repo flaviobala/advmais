@@ -10,13 +10,25 @@
 <body class="h-full">
 
 <div class="min-h-full">
-    <div class="fixed inset-y-0 left-0 flex w-64 flex-col bg-slate-900 pt-5 pb-4 shadow-xl">
-        <div class="flex flex-shrink-0 items-center px-4 mb-2">
-            <h1 class="text-2xl font-bold text-white">AdvMais</h1>
-            <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-orange-500 text-white rounded">Admin</span>
+    <!-- Overlay mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 flex-col bg-slate-900 pt-5 pb-4 shadow-xl transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex">
+        <div class="flex flex-shrink-0 items-center justify-between px-4 mb-2">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold text-white">AdvMais</h1>
+                <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-orange-500 text-white rounded">Admin</span>
+            </div>
+            <!-- Botao fechar mobile -->
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
-        <nav class="mt-5 flex-1 space-y-1 px-2">
+        <nav class="mt-5 flex-1 space-y-1 px-2 overflow-y-auto">
             <a href="{{ route('admin.dashboard') }}"
                class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.dashboard') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                 <svg class="mr-3 h-6 w-6 {{ request()->routeIs('admin.dashboard') ? 'text-blue-400' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,14 +97,31 @@
         </div>
     </div>
 
-    <div class="flex flex-1 flex-col pl-64">
+    <!-- Conteudo principal -->
+    <div class="flex flex-1 flex-col md:pl-64">
+        <!-- Header mobile -->
+        <div class="sticky top-0 z-30 bg-slate-900 px-4 py-3 md:hidden">
+            <div class="flex items-center justify-between">
+                <button onclick="toggleSidebar()" class="text-white hover:text-slate-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <div class="flex items-center">
+                    <h1 class="text-lg font-bold text-white">AdvMais</h1>
+                    <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-orange-500 text-white rounded">Admin</span>
+                </div>
+                <div class="w-6"></div>
+            </div>
+        </div>
+
         <main class="flex-1">
-            <div class="py-6">
+            <div class="py-4 md:py-6">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
                     @if(session('success'))
                         <div class="mb-4 rounded-lg bg-green-50 border border-green-200 p-4">
                             <div class="flex">
-                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="h-5 w-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 <p class="ml-3 text-sm font-medium text-green-800">{{ session('success') }}</p>
@@ -103,7 +132,7 @@
                     @if(session('error'))
                         <div class="mb-4 rounded-lg bg-red-50 border border-red-200 p-4">
                             <div class="flex">
-                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="h-5 w-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                 </svg>
                                 <p class="ml-3 text-sm font-medium text-red-800">{{ session('error') }}</p>
@@ -111,7 +140,7 @@
                         </div>
                     @endif
 
-                    <h1 class="text-2xl font-semibold text-gray-900 mb-6">{{ $title ?? 'Admin' }}</h1>
+                    <h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-4 md:mb-6">{{ $title ?? 'Admin' }}</h1>
 
                     {{ $slot }}
                 </div>
@@ -119,6 +148,16 @@
         </main>
     </div>
 </div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+</script>
 
 </body>
 </html>

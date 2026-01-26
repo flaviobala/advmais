@@ -9,11 +9,21 @@
 <body class="h-full">
 
 <div class="min-h-full">
-    <div class="fixed inset-y-0 left-0 flex w-64 flex-col bg-slate-900 pt-5 pb-4 shadow-xl">
-        <div class="flex flex-shrink-0 items-center px-4 mb-6">
+    <!-- Overlay mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 flex-col bg-slate-900 pt-5 pb-4 shadow-xl transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex">
+        <div class="flex flex-shrink-0 items-center justify-between px-4 mb-6">
             <h1 class="text-2xl font-bold text-white">AdvMais</h1>
+            <!-- Botao fechar mobile -->
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
-        
+
         <nav class="mt-5 flex-1 space-y-1 px-2">
             <a href="{{ route('dashboard') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md bg-slate-800 text-white">
                 <svg class="mr-3 h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,19 +54,43 @@
         </nav>
     </div>
 
-    <div class="flex flex-1 flex-col pl-64">
+    <!-- Conteudo principal -->
+    <div class="flex flex-1 flex-col md:pl-64">
+        <!-- Header mobile -->
+        <div class="sticky top-0 z-30 bg-slate-900 px-4 py-3 md:hidden">
+            <div class="flex items-center justify-between">
+                <button onclick="toggleSidebar()" class="text-white hover:text-slate-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <h1 class="text-lg font-bold text-white">AdvMais</h1>
+                <div class="w-6"></div>
+            </div>
+        </div>
+
         <main class="flex-1">
-            <div class="py-6">
+            <div class="py-4 md:py-6">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                    <h1 class="text-2xl font-semibold text-gray-900 mb-6">{{ $title ?? 'Dashboard' }}</h1>
-                    
+                    <h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-4 md:mb-6">{{ $title ?? 'Dashboard' }}</h1>
+
                     {{ $slot }}
-                    
+
                 </div>
             </div>
         </main>
     </div>
 </div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+</script>
 
 </body>
 </html>
