@@ -69,6 +69,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin AdvMais',
             'email' => 'admin@advmais.local',
             'password' => Hash::make('12345678'),
+            'role' => 'admin',
         ]);
 
         // Aluno OAB (Só deve ver Penal)
