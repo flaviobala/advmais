@@ -97,19 +97,27 @@
 
         <div class="space-y-3">
             @forelse($course->lessons as $index => $lesson)
-                <div class="border border-gray-200 rounded-lg hover:border-blue-300 transition-colors duration-200">
+                <div class="border border-gray-200 rounded-lg {{ $lesson->is_accessible ? 'hover:border-blue-300' : 'opacity-60 bg-gray-50' }} transition-colors duration-200">
                     <div class="p-4 flex items-center justify-between">
                         <div class="flex items-center gap-4 flex-1">
                             <!-- Número da Aula -->
                             <div class="flex-shrink-0">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <span class="text-blue-600 font-bold text-sm">{{ $index + 1 }}</span>
-                                </div>
+                                @if($lesson->is_accessible)
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span class="text-blue-600 font-bold text-sm">{{ $index + 1 }}</span>
+                                    </div>
+                                @else
+                                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Info da Aula -->
                             <div class="flex-1">
-                                <h3 class="font-semibold text-gray-900 mb-1">{{ $lesson->title }}</h3>
+                                <h3 class="font-semibold {{ $lesson->is_accessible ? 'text-gray-900' : 'text-gray-400' }} mb-1">{{ $lesson->title }}</h3>
                                 @if($lesson->duration_seconds)
                                     <p class="text-sm text-gray-500">
                                         Duração: {{ gmdate('i:s', $lesson->duration_seconds) }} minutos
@@ -119,7 +127,11 @@
 
                             <!-- Status da Aula -->
                             <div class="flex items-center gap-3">
-                                @if($lesson->is_completed)
+                                @if(!$lesson->is_accessible)
+                                    <span class="flex items-center gap-2 text-gray-400 font-medium text-sm">
+                                        Bloqueada
+                                    </span>
+                                @elseif($lesson->is_completed)
                                     <span class="flex items-center gap-2 text-green-600 font-medium text-sm">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -135,16 +147,18 @@
                                     </span>
                                 @endif
 
-                                <!-- Botão Assistir -->
-                                <a href="{{ route('courses.lesson', [$course->id, $lesson->id]) }}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors duration-200">
-                                    @if($lesson->is_completed)
-                                        Rever
-                                    @elseif($lesson->progress_percentage > 0)
-                                        Continuar
-                                    @else
-                                        Assistir
-                                    @endif
-                                </a>
+                                @if($lesson->is_accessible)
+                                    <!-- Botão Assistir -->
+                                    <a href="{{ route('courses.lesson', [$course->id, $lesson->id]) }}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors duration-200">
+                                        @if($lesson->is_completed)
+                                            Rever
+                                        @elseif($lesson->progress_percentage > 0)
+                                            Continuar
+                                        @else
+                                            Assistir
+                                        @endif
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
