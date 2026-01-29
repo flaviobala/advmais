@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Course;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -12,28 +14,44 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Busca os IDs dos grupos do usuário
-        $userGroupIds = $user->groups()->pluck('groups.id');
-
-        // Busca cursos ativos que pertencem aos grupos do usuário
-        $courses = Course::active()
+        // Sem grupos: o usuário vê cursos ativos por padrão.
+        $fullAccessCourses = Course::active()
             ->withCount('lessons')
-            ->whereHas('groups', function($query) use ($userGroupIds) {
-                $query->whereIn('groups.id', $userGroupIds);
-            })
-            ->with('lessons') // Carrega as aulas para calcular progresso
+            ->with(['lessons', 'category'])
             ->get()
             ->map(function($course) use ($user) {
-                // Adiciona o progresso do usuário no curso
                 $course->progress = $course->getProgressForUser($user->id);
-
-                // Calcula a duração total do curso em minutos
                 $course->total_duration_minutes = $course->lessons->sum('duration_seconds') / 60;
-
+                $course->access_type = 'full';
                 return $course;
             });
 
-        // Retorna a view enviando a variável $courses e o nome do usuário
-        return view('dashboard', compact('courses', 'user'));
+        // Aulas com acesso direto do usuário (parcial)
+        $lessonCourseIdsDirect = $user->accessibleLessons()->distinct()->pluck('course_id');
+
+        $partialAccessCourses = Course::active()
+            ->whereIn('id', $lessonCourseIdsDirect)
+            ->with(['lessons', 'category'])
+            ->get()
+            ->map(function($course) use ($user) {
+                $accessibleIds = $user->getAccessibleLessonIdsForCourse($course->id);
+                $course->lessons_count = count($accessibleIds);
+                $course->progress = $course->getProgressForUser($user->id);
+                $course->total_duration_minutes = $course->lessons
+                    ->whereIn('id', $accessibleIds)
+                    ->sum('duration_seconds') / 60;
+                $course->access_type = 'partial';
+                return $course;
+            });
+
+        $courses = $fullAccessCourses->merge($partialAccessCourses)->unique('id');
+
+        // Agrupar por categoria
+        $categories = Category::active()->orderBy('order')->orderBy('name')->get();
+        $categorizedCourses = $courses->groupBy(function($course) {
+            return $course->category_id ?? 0;
+        });
+
+        return view('dashboard', compact('courses', 'categories', 'categorizedCourses', 'user'));
     }
 }

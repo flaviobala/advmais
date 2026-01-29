@@ -16,9 +16,9 @@ class StoreCourseRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
+            'category_id' => 'nullable|exists:categories,id',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'preview_video_provider' => 'nullable|in:youtube,vimeo',
-            'preview_video_id' => 'nullable|string|max:255',
+            'course_video' => 'nullable|file|mimes:mp4,webm,ogg,mov|max:204800',
         ];
     }
 

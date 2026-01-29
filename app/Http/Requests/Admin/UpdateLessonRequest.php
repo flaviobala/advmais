@@ -18,9 +18,10 @@ class UpdateLessonRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'order' => 'required|integer|min:0',
-            'video_provider' => ['required', Rule::enum(VideoProvider::class)],
-            'video_ref_id' => 'required|string|max:255',
+            'video_provider' => ['nullable', Rule::enum(VideoProvider::class), 'required_without:attachment'],
+            'video_ref_id' => ['nullable', 'string', 'max:255', 'required_without:attachment'],
             'duration_seconds' => 'nullable|integer|min:0',
+            'attachment' => 'nullable|file|mimes:mp4,webm,ogg,pdf,zip,docx|max:204800',
         ];
     }
 

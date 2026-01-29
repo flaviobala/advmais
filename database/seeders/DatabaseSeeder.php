@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Group;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Enums\VideoProvider; // Importante: Usando o Enum que criamos
@@ -14,20 +13,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Criar os Grupos (Turmas)
-        $grupoOAB = Group::create([
-            'name' => 'Turma OAB 2026',
-            'slug' => 'turma-oab-2026',
-            'is_active' => true
-        ]);
-
-        $grupoVIP = Group::create([
-            'name' => 'Mentoria VIP Advocacia',
-            'slug' => 'mentoria-vip',
-            'is_active' => true
-        ]);
-
-        // 2. Criar Cursos
+        // 1. Criar Cursos
         $cursoPenal = Course::create([
             'title' => 'Direito Penal Avançado',
             'description' => 'Curso preparatório para segunda fase.',
@@ -55,15 +41,7 @@ class DatabaseSeeder extends Seeder
             'order' => 1
         ]);
 
-        // 4. LIGAR Cursos aos Grupos (A Regra de Ouro)
-        // Turma OAB só vê Penal
-        $grupoOAB->courses()->attach($cursoPenal->id);
-        
-        // Mentoria VIP só vê Marketing
-        $grupoVIP->courses()->attach($cursoMkt->id);
-
-        // 5. Criar Usuários de Teste
-        
+        // 4. Criar Usuários de Teste
         // Usuário ADMIN (Vê tudo - futuramente)
         User::create([
             'name' => 'Admin AdvMais',
@@ -73,20 +51,17 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Aluno OAB (Só deve ver Penal)
-        $alunoOAB = User::create([
-            'name' => 'Dr. João (Aluno OAB)',
+        User::create([
+            'name' => 'Dr. João',
             'email' => 'joao@oab.teste',
             'password' => Hash::make('12345678'),
         ]);
-        $alunoOAB->groups()->attach($grupoOAB->id);
 
-        // Aluno VIP (Só deve ver Marketing)
-        $alunoVIP = User::create([
-            'name' => 'Dra. Maria (Aluna VIP)',
+        User::create([
+            'name' => 'Dra. Maria',
             'email' => 'maria@vip.teste',
             'password' => Hash::make('12345678'),
         ]);
-        $alunoVIP->groups()->attach($grupoVIP->id);
         $this->call(CourseSeeder::class);
     }
 }

@@ -16,22 +16,25 @@ class CourseController extends Controller
     {
         $user = auth()->user();
 
-        // Verifica se o usuário tem acesso ao curso
-        if (!$user->hasAccessToCourse($id)) {
+        $hasFullAccess = $user->hasAccessToCourse($id);
+        $hasPartialAccess = $user->hasPartialAccessToCourse($id);
+
+        if (!$hasFullAccess && !$hasPartialAccess) {
             abort(403, 'Você não tem permissão para acessar este curso.');
         }
 
-        // Busca o curso com suas aulas ordenadas
         $course = Course::with(['lessons' => function($query) {
             $query->orderBy('order');
         }])
         ->findOrFail($id);
 
-        // Calcula o progresso do usuário no curso
-        $course->progress = $course->getProgressForUser($user->id);
+        $accessibleLessonIds = $user->getAccessibleLessonIdsForCourse($id);
 
-        // Adiciona informações de progresso para cada aula
-        $course->lessons->each(function($lesson) use ($user) {
+        $course->progress = $course->getProgressForUser($user->id);
+        $course->has_full_access = $hasFullAccess;
+
+        $course->lessons->each(function($lesson) use ($user, $accessibleLessonIds) {
+            $lesson->is_accessible = in_array($lesson->id, $accessibleLessonIds);
             $userLesson = $user->lessons()->where('lesson_id', $lesson->id)->first();
             $lesson->is_completed = $userLesson ? $userLesson->pivot->is_completed : false;
             $lesson->progress_percentage = $userLesson ? $userLesson->pivot->progress_percentage : 0;
@@ -47,8 +50,7 @@ class CourseController extends Controller
     {
         $user = auth()->user();
 
-        // Verifica se o usuário tem acesso ao curso
-        if (!$user->hasAccessToCourse($courseId)) {
+        if (!$user->hasAccessToLesson($lessonId)) {
             abort(403, 'Você não tem permissão para acessar esta aula.');
         }
 
