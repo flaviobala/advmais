@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
-use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +13,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::withCount('groups');
+        $query = User::query();
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -108,24 +107,22 @@ class UserController extends Controller
             ->with('success', "Usuário {$status} com sucesso!");
     }
 
-    public function groups(User $user)
+    public function show(User $user)
     {
-        $allGroups = Group::where('is_active', true)->orderBy('name')->get();
-        $userGroupIds = $user->groups()->pluck('groups.id')->toArray();
+        // Carrega cursos ativos com aulas
+        $courses = \App\Models\Course::with(['lessons' => fn($q) => $q->orderBy('order'), 'category'])->orderBy('title')->get();
 
-        return view('admin.users.groups', compact('user', 'allGroups', 'userGroupIds'));
-    }
+        // Para cada curso, determina se o usuário tem acesso completo, parcial ou nenhum
+        $courses = $courses->map(function($course) use ($user) {
+            $course->access = 'none';
+            if ($user->hasAccessToCourse($course->id)) {
+                $course->access = 'full';
+            } elseif ($user->hasPartialAccessToCourse($course->id)) {
+                $course->access = 'partial';
+            }
+            return $course;
+        });
 
-    public function syncGroups(Request $request, User $user)
-    {
-        $request->validate([
-            'groups' => 'array',
-            'groups.*' => 'exists:groups,id',
-        ]);
-
-        $user->groups()->sync($request->groups ?? []);
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'Grupos do usuário atualizados!');
+        return view('admin.users.show', compact('user', 'courses'));
     }
 }
