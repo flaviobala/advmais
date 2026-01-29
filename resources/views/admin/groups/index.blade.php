@@ -49,6 +49,7 @@
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('admin.groups.courses', $group) }}" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Cursos</a>
+                        <a href="{{ route('admin.groups.lessons', $group) }}" class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Aulas</a>
                         <a href="{{ route('admin.groups.edit', $group) }}" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Editar</a>
                         <form action="{{ route('admin.groups.destroy', $group) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir este grupo?')">
                             @csrf
@@ -104,6 +105,7 @@
                             </td>
                             <td class="px-6 py-4 text-right text-sm font-medium">
                                 <a href="{{ route('admin.groups.courses', $group) }}" class="text-blue-600 hover:text-blue-900 mr-3">Cursos</a>
+                                <a href="{{ route('admin.groups.lessons', $group) }}" class="text-purple-600 hover:text-purple-900 mr-3">Aulas</a>
                                 <a href="{{ route('admin.groups.edit', $group) }}" class="text-yellow-600 hover:text-yellow-900 mr-3">Editar</a>
                                 <form action="{{ route('admin.groups.destroy', $group) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir este grupo?')">
                                     @csrf
