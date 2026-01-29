@@ -75,10 +75,13 @@
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }}">
                             {{ ucfirst($user->role) }}
                         </span>
-                        <span class="text-xs text-gray-500">{{ $user->groups_count }} grupos</span>
+                        <!-- grupos removed -->
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <a href="{{ route('admin.users.groups', $user) }}" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Grupos</a>
+                        <!-- grupos removed -->
+                        <a href="{{ route('admin.users.courses', $user) }}" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Cursos</a>
+                        <a href="{{ route('admin.users.categories', $user) }}" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Categorias</a>
+                        <a href="{{ route('admin.users.lessons', $user) }}" class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Aulas</a>
                         <a href="{{ route('admin.users.edit', $user) }}" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Editar</a>
                         @if($user->id !== auth()->id())
                             <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" class="inline">
@@ -110,7 +113,7 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuário</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Papel</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupos</th>
+                        <!-- Grupos column removed -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                     </tr>
@@ -142,9 +145,7 @@
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                {{ $user->groups_count }} grupos
-                            </td>
+                            <!-- Grupos column removed -->
                             <td class="px-6 py-4">
                                 @if($user->is_active)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -157,7 +158,10 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right text-sm font-medium">
-                                <a href="{{ route('admin.users.groups', $user) }}" class="text-blue-600 hover:text-blue-900 mr-3">Grupos</a>
+                                <!-- Grupos action removed -->
+                                <a href="{{ route('admin.users.courses', $user) }}" class="text-blue-600 hover:text-blue-900 mr-3">Cursos</a>
+                                <a href="{{ route('admin.users.categories', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Categorias</a>
+                                <a href="{{ route('admin.users.lessons', $user) }}" class="text-purple-600 hover:text-purple-900 mr-3">Aulas</a>
                                 <a href="{{ route('admin.users.edit', $user) }}" class="text-yellow-600 hover:text-yellow-900 mr-3">Editar</a>
                                 @if($user->id !== auth()->id())
                                     <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" class="inline mr-3">
