@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -15,14 +16,22 @@ class Course extends Model
         'title',
         'description',
         'cover_image',
-        'preview_video_provider',
-        'preview_video_id',
+        'course_video',
         'is_active',
+        'category_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Relacionamento: Um curso pertence a uma categoria (opcional).
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     /**
      * Relacionamento: Um curso tem muitas aulas.
@@ -35,12 +44,7 @@ class Course extends Model
     /**
      * Relacionamento: Um curso pertence a muitos grupos (turmas).
      */
-    public function groups(): BelongsToMany
-    {
-        return $this->belongsToMany(Group::class, 'course_group')
-                    ->withPivot('available_at')
-                    ->withTimestamps();
-    }
+    // groups removed
 
     /**
      * Scope: Filtra apenas cursos ativos.

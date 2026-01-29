@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lesson extends Model
 {
@@ -18,6 +19,12 @@ class Lesson extends Model
         'video_provider',
         'video_ref_id',
         'duration_seconds',
+        'attachment',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -36,5 +43,28 @@ class Lesson extends Model
         return $this->belongsToMany(User::class, 'lesson_user')
                     ->withPivot('is_completed', 'progress_percentage', 'completed_at')
                     ->withTimestamps();
+    }
+
+    /**
+     * Relacionamento: Grupos que têm acesso direto a esta aula.
+     */
+    // groups removed
+
+    /**
+     * Relacionamento: Usuários que têm acesso direto a esta aula.
+     */
+    public function accessUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'lesson_user_access')
+                    ->withPivot('available_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Relacionamento: Anexos/arquivos complementares da aula.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(LessonAttachment::class)->orderBy('order');
     }
 }

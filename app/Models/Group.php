@@ -33,4 +33,14 @@ class Group extends Model
                     ->withPivot('available_at')
                     ->withTimestamps();
     }
+
+    /**
+     * Relacionamento: Um grupo tem acesso a aulas específicas.
+     */
+    public function accessibleLessons(): BelongsToMany
+    {
+        return $this->belongsToMany(Lesson::class, 'lesson_group')
+                    ->withPivot('available_at')
+                    ->withTimestamps();
+    }
 }
