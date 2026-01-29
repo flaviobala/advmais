@@ -14,25 +14,12 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow p-6">
-                @if($course->preview_video_id)
+                @if($course->course_video)
                     <div class="w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
-                        @if($course->preview_video_provider === 'youtube')
-                            <iframe
-                                class="w-full h-full"
-                                src="https://www.youtube.com/embed/{{ $course->preview_video_id }}"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen>
-                            </iframe>
-                        @elseif($course->preview_video_provider === 'vimeo')
-                            <iframe
-                                class="w-full h-full"
-                                src="https://player.vimeo.com/video/{{ $course->preview_video_id }}"
-                                frameborder="0"
-                                allow="autoplay; fullscreen; picture-in-picture"
-                                allowfullscreen>
-                            </iframe>
-                        @endif
+                        <video class="w-full h-full" controls>
+                            <source src="{{ Storage::url($course->course_video) }}" type="video/mp4">
+                            Seu navegador não suporta vídeo.
+                        </video>
                     </div>
                 @elseif($course->cover_image)
                     <img src="{{ Storage::url($course->cover_image) }}" alt="{{ $course->title }}" class="w-full rounded-lg mb-4">
@@ -61,30 +48,13 @@
                 @endif
 
                 <div class="border-t border-gray-200 pt-4 mt-4">
-                    <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="grid grid-cols-1 gap-4 text-center">
                         <div>
                             <p class="text-2xl font-bold text-blue-600">{{ $course->lessons->count() }}</p>
                             <p class="text-sm text-gray-500">Aulas</p>
                         </div>
-                        <div>
-                            <p class="text-2xl font-bold text-green-600">{{ $course->groups->count() }}</p>
-                            <p class="text-sm text-gray-500">Grupos</p>
-                        </div>
                     </div>
                 </div>
-
-                @if($course->groups->count() > 0)
-                    <div class="border-t border-gray-200 pt-4 mt-4">
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">Grupos vinculados:</h3>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($course->groups as $group)
-                                <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                    {{ $group->name }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
 
