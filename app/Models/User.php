@@ -32,6 +32,16 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isProfessor(): bool
+    {
+        return $this->role === 'professor';
+    }
+
+    public function canAccessAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'professor']);
+    }
+
     // Relacionamento: Usuário pertence a vários grupos
     // groups removed
 
@@ -71,28 +81,40 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
-    // HELPER DE SEGURANÇA: Verifica se o usuário pode ver o curso X (acesso completo via grupo)
     public function hasAccessToCourse($courseId): bool
     {
-        // Simplified: access if course is active
-        $course = \App\Models\Course::find($courseId);
-        if (!$course) return false;
-        return (bool) $course->is_active;
+        if ($this->canAccessAdmin()) {
+            return true;
+        }
+
+        $course = Course::find($courseId);
+        if (!$course || !$course->is_active) {
+            return false;
+        }
+
+        if ($this->courses()->where('course_id', $courseId)->exists()) {
+            return true;
+        }
+
+        if ($course->category_id && $this->categories()->where('category_id', $course->category_id)->exists()) {
+            return true;
+        }
+
+        return false;
     }
 
-    /**
-     * Verifica se o usuário tem acesso a uma aula específica.
-     * Acesso via: curso completo (grupo) OU aula individual (grupo/usuário).
-     */
     public function hasAccessToLesson($lessonId): bool
     {
+        if ($this->canAccessAdmin()) {
+            return true;
+        }
+
         $lesson = Lesson::find($lessonId);
         if (!$lesson) {
             return false;
         }
 
-        // Access if course active or explicit user access
-        if ($lesson->course && $lesson->course->is_active) {
+        if ($this->hasAccessToCourse($lesson->course_id)) {
             return true;
         }
 

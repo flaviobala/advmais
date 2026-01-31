@@ -14,15 +14,26 @@ use Illuminate\Support\Facades\Storage;
 
 class LessonController extends Controller
 {
+    private function authorizeCourse(Course $course): void
+    {
+        if (auth()->user()->isProfessor() && $course->created_by !== auth()->id()) {
+            abort(403, 'Você não possui permissão para acessar este conteúdo.');
+        }
+    }
+
     public function create(Course $course)
     {
+        $this->authorizeCourse($course);
+        $moduleId = request('module_id');
+        $module = $moduleId ? \App\Models\Module::find($moduleId) : null;
         $nextOrder = $course->lessons()->max('order') + 1;
         $providers = VideoProvider::cases();
-        return view('admin.lessons.create', compact('course', 'nextOrder', 'providers'));
+        return view('admin.lessons.create', compact('course', 'nextOrder', 'providers', 'module'));
     }
 
     public function store(StoreLessonRequest $request, Course $course)
     {
+        $this->authorizeCourse($course);
         $data = $request->validated();
 
         // Remover attachment do data (será tratado separadamente)
@@ -52,6 +63,7 @@ class LessonController extends Controller
 
     public function edit(Lesson $lesson)
     {
+        $this->authorizeCourse($lesson->course);
         $lesson->load('attachments');
         $providers = VideoProvider::cases();
         return view('admin.lessons.edit', compact('lesson', 'providers'));
@@ -59,6 +71,7 @@ class LessonController extends Controller
 
     public function update(UpdateLessonRequest $request, Lesson $lesson)
     {
+        $this->authorizeCourse($lesson->course);
         $data = $request->validated();
 
         // Remover attachment do data
@@ -90,13 +103,14 @@ class LessonController extends Controller
 
     public function destroy(Lesson $lesson)
     {
+        $this->authorizeCourse($lesson->course);
         $courseId = $lesson->course_id;
         
         // Deletar arquivos físicos dos anexos
         foreach ($lesson->attachments as $attachment) {
             Storage::disk('public')->delete($attachment->filepath);
         }
-        
+
         $lesson->delete();
 
         return redirect()->route('admin.courses.edit', $courseId)
@@ -107,6 +121,7 @@ class LessonController extends Controller
     {
         $lessonId = $attachment->lesson_id;
         $lesson = Lesson::find($lessonId);
+        $this->authorizeCourse($lesson->course);
         
         // Deletar arquivo físico
         Storage::disk('public')->delete($attachment->filepath);
@@ -119,6 +134,7 @@ class LessonController extends Controller
 
     public function toggleActive(Lesson $lesson)
     {
+        $this->authorizeCourse($lesson->course);
         $lesson->update(['is_active' => !$lesson->is_active]);
 
         $status = $lesson->is_active ? 'ativada' : 'desativada';

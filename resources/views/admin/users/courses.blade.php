@@ -32,7 +32,7 @@
                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                 <div class="flex-1">
                                     <span class="text-sm text-gray-900 font-medium">{{ $course->title }}</span>
-                                    <p class="text-xs text-gray-500">{{ $course->category->name ?? 'Sem categoria' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $course->category->name ?? 'Sem trilha' }}</p>
                                 </div>
                             </label>
                             <div class="flex items-center gap-2">

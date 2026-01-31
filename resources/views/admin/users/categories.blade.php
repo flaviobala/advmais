@@ -1,19 +1,19 @@
-<x-admin-layout title="Categorias do Usuário: {{ $user->name }}">
+<x-admin-layout title="Trilhas do Usuário: {{ $user->name }}">
     <div class="mb-6">
         <a href="{{ route('admin.users.index') }}" class="text-blue-600 hover:text-blue-800 text-sm">&larr; Voltar para lista de usuários</a>
     </div>
 
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b border-gray-200">
-            <h2 class="text-lg font-medium text-gray-900">Gerenciar Categorias</h2>
-            <p class="text-sm text-gray-500 mt-1">Selecione as categorias para liberar ao usuário <strong>{{ $user->name }}</strong>.</p>
+            <h2 class="text-lg font-medium text-gray-900">Gerenciar Trilhas</h2>
+            <p class="text-sm text-gray-500 mt-1">Selecione as trilhas para liberar ao usuário <strong>{{ $user->name }}</strong>.</p>
         </div>
 
         <form action="{{ route('admin.users.categories.sync', $user) }}" method="POST" class="p-6">
             @csrf
 
             @if($categories->isEmpty())
-                <p class="text-gray-500 text-center py-8">Nenhuma categoria ativa encontrada.</p>
+                <p class="text-gray-500 text-center py-8">Nenhuma trilha ativa encontrada.</p>
             @else
                 <div class="space-y-3">
                     @foreach($categories as $category)
@@ -32,7 +32,7 @@
                                 </div>
                             </label>
                             <button type="button" data-category-id="{{ $category->id }}" class="text-xs inline-flex items-center px-2 py-1 rounded {{ $category->is_active ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700' }} toggle-category">
-                                {{ $category->is_active ? 'Desativar Categoria' : 'Ativar Categoria' }}
+                                {{ $category->is_active ? 'Desativar Trilha' : 'Ativar Trilha' }}
                             </button>
                         </div>
                     @endforeach
@@ -46,7 +46,7 @@
                 </a>
                 <button type="submit"
                         class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                    Salvar Categorias
+                    Salvar Trilhas
                 </button>
             </div>
         </form>

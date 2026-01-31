@@ -17,8 +17,9 @@ class UpdateCourseRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
             'category_id' => 'nullable|exists:categories,id',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'course_video' => 'nullable|file|mimes:mp4,webm,ogg,mov|max:204800',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'course_video' => 'nullable|url|max:500',
         ];
     }
 

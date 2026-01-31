@@ -53,15 +53,14 @@
                                 <span>{{ $course->lessons_count }} aulas</span>
                                 <span>{{ $course->groups_count }} grupos</span>
                             </div>
-                            <div class="mt-2">
+                            <div class="mt-2 flex flex-wrap gap-1">
                                 @if($course->is_active)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Ativo
-                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                        Inativo
-                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inativo</span>
+                                @endif
+                                @if(!$course->is_approved)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pendente</span>
                                 @endif
                             </div>
                         </div>
@@ -69,6 +68,13 @@
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('admin.courses.show', $course) }}" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Ver</a>
                         <a href="{{ route('admin.courses.edit', $course) }}" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Editar</a>
+                        @if(auth()->user()->isAdmin() && !$course->is_approved)
+                            <form action="{{ route('admin.courses.approve', $course) }}" method="POST" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Aprovar</button>
+                            </form>
+                        @endif
                         <form action="{{ route('admin.courses.destroy', $course) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir este curso?')">
                             @csrf
                             @method('DELETE')
@@ -123,19 +129,27 @@
                                 {{ $course->groups_count }} grupos
                             </td>
                             <td class="px-6 py-4">
-                                @if($course->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Ativo
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                        Inativo
-                                    </span>
-                                @endif
+                                <div class="flex flex-wrap gap-1">
+                                    @if($course->is_active)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inativo</span>
+                                    @endif
+                                    @if(!$course->is_approved)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pendente</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-right text-sm font-medium">
                                 <a href="{{ route('admin.courses.show', $course) }}" class="text-blue-600 hover:text-blue-900 mr-3">Ver</a>
                                 <a href="{{ route('admin.courses.edit', $course) }}" class="text-yellow-600 hover:text-yellow-900 mr-3">Editar</a>
+                                @if(auth()->user()->isAdmin() && !$course->is_approved)
+                                    <form action="{{ route('admin.courses.approve', $course) }}" method="POST" class="inline mr-3">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-green-600 hover:text-green-900">Aprovar</button>
+                                    </form>
+                                @endif
                                 <form action="{{ route('admin.courses.destroy', $course) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir este curso?')">
                                     @csrf
                                     @method('DELETE')

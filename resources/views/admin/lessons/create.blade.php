@@ -8,10 +8,16 @@
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b border-gray-200">
             <h2 class="text-lg font-medium text-gray-900">Nova Aula para: {{ $course->title }}</h2>
+            @if($module)
+                <p class="text-sm text-blue-600 mt-1">M&oacute;dulo: {{ $module->title }}</p>
+            @endif
         </div>
 
         <form action="{{ route('admin.courses.lessons.store', $course) }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
             @csrf
+            @if($module)
+                <input type="hidden" name="module_id" value="{{ $module->id }}">
+            @endif
 
             <div>
                 <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Título da Aula *</label>
@@ -25,6 +31,24 @@
                 @error('title')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descri&ccedil;&atilde;o (opcional)</label>
+                <textarea id="description"
+                          name="description"
+                          rows="3"
+                          maxlength="1000"
+                          placeholder="Descreva brevemente o conte&uacute;do desta aula..."
+                          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+                <div class="flex justify-between mt-1">
+                    <div>
+                        @error('description')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <span id="desc-counter" class="text-xs text-gray-400">0/1000</span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -130,11 +154,11 @@
     </div>
 
     <script>
+        // Attachments preview
         document.getElementById('attachments').addEventListener('change', function(e) {
             const filesList = document.getElementById('files-list');
             const preview = document.getElementById('files-preview');
             filesList.innerHTML = '';
-            
             if (this.files.length > 0) {
                 preview.classList.remove('hidden');
                 for (let i = 0; i < this.files.length; i++) {
@@ -149,5 +173,15 @@
                 preview.classList.add('hidden');
             }
         });
+
+        // Description counter
+        const descField = document.getElementById('description');
+        const descCounter = document.getElementById('desc-counter');
+        function updateCounter() {
+            descCounter.textContent = descField.value.length + '/1000';
+        }
+        descField.addEventListener('input', updateCounter);
+        updateCounter();
+
     </script>
 </x-admin-layout>

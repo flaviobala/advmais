@@ -14,8 +14,8 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (auth()->user()->role !== 'admin') {
-            abort(403, 'Acesso restrito a administradores.');
+        if (!auth()->user()->canAccessAdmin()) {
+            abort(403, 'Esta área é restrita. Você não possui permissão para acessá-la.');
         }
 
         if (!auth()->user()->is_active) {

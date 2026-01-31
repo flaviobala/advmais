@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Course;
-use App\Models\Lesson;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -14,44 +12,56 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Sem grupos: o usuário vê cursos ativos por padrão.
-        $fullAccessCourses = Course::active()
+        // Trilhas ativas com contagem de cursos aprovados
+        $isAdmin = in_array($user->role, ['admin', 'professor']);
+        $userCategoryIds = $isAdmin ? [] : $user->categories()->pluck('category_id')->toArray();
+
+        $categories = Category::active()
+            ->withCount(['courses' => function ($q) {
+                $q->where('is_active', true)->where('is_approved', true);
+            }])
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) use ($isAdmin, $userCategoryIds) {
+                $category->is_locked = !$isAdmin && !in_array($category->id, $userCategoryIds);
+                return $category;
+            })
+            ->sortBy('is_locked')
+            ->values();
+
+        // Cursos sem trilha (orphans)
+        $orphanCourses = Course::active()
+            ->where('is_approved', true)
+            ->whereNull('category_id')
             ->withCount('lessons')
-            ->with(['lessons', 'category'])
+            ->with('lessons')
             ->get()
-            ->map(function($course) use ($user) {
-                $course->progress = $course->getProgressForUser($user->id);
-                $course->total_duration_minutes = $course->lessons->sum('duration_seconds') / 60;
-                $course->access_type = 'full';
+            ->map(function ($course) use ($user) {
+                $hasFullAccess = $user->hasAccessToCourse($course->id);
+                $hasPartialAccess = !$hasFullAccess && $user->hasPartialAccessToCourse($course->id);
+
+                $course->is_locked = !$hasFullAccess && !$hasPartialAccess;
+                $course->has_full_access = $hasFullAccess;
+                $course->access_type = $hasFullAccess ? 'full' : ($hasPartialAccess ? 'partial' : 'locked');
+
+                if (!$course->is_locked) {
+                    $accessibleIds = $user->getAccessibleLessonIdsForCourse($course->id);
+                    if (!$hasFullAccess) {
+                        $course->lessons_count = count($accessibleIds);
+                    }
+                    $course->progress = $course->getProgressForUser($user->id);
+                    $course->total_duration_minutes = $course->lessons
+                        ->whereIn('id', $accessibleIds)
+                        ->sum('duration_seconds') / 60;
+                } else {
+                    $course->progress = 0;
+                    $course->total_duration_minutes = $course->lessons->sum('duration_seconds') / 60;
+                }
+
                 return $course;
             });
 
-        // Aulas com acesso direto do usuário (parcial)
-        $lessonCourseIdsDirect = $user->accessibleLessons()->distinct()->pluck('course_id');
-
-        $partialAccessCourses = Course::active()
-            ->whereIn('id', $lessonCourseIdsDirect)
-            ->with(['lessons', 'category'])
-            ->get()
-            ->map(function($course) use ($user) {
-                $accessibleIds = $user->getAccessibleLessonIdsForCourse($course->id);
-                $course->lessons_count = count($accessibleIds);
-                $course->progress = $course->getProgressForUser($user->id);
-                $course->total_duration_minutes = $course->lessons
-                    ->whereIn('id', $accessibleIds)
-                    ->sum('duration_seconds') / 60;
-                $course->access_type = 'partial';
-                return $course;
-            });
-
-        $courses = $fullAccessCourses->merge($partialAccessCourses)->unique('id');
-
-        // Agrupar por categoria
-        $categories = Category::active()->orderBy('order')->orderBy('name')->get();
-        $categorizedCourses = $courses->groupBy(function($course) {
-            return $course->category_id ?? 0;
-        });
-
-        return view('dashboard', compact('courses', 'categories', 'categorizedCourses', 'user'));
+        return view('dashboard', compact('categories', 'orphanCourses', 'user'));
     }
 }

@@ -67,9 +67,9 @@
                         @php
                             $roleColors = [
                                 'admin' => 'bg-red-100 text-red-800',
-                                'advogado' => 'bg-blue-100 text-blue-800',
-                                'cliente' => 'bg-green-100 text-green-800',
-                                'funcionario' => 'bg-yellow-100 text-yellow-800',
+                                'membro' => 'bg-blue-100 text-blue-800',
+                                'aluno' => 'bg-green-100 text-green-800',
+                                'professor' => 'bg-yellow-100 text-yellow-800',
                             ];
                         @endphp
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }}">
@@ -80,7 +80,7 @@
                     <div class="flex flex-wrap gap-2">
                         <!-- grupos removed -->
                         <a href="{{ route('admin.users.courses', $user) }}" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Cursos</a>
-                        <a href="{{ route('admin.users.categories', $user) }}" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Categorias</a>
+                        <a href="{{ route('admin.users.categories', $user) }}" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Trilhas</a>
                         <a href="{{ route('admin.users.lessons', $user) }}" class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Aulas</a>
                         <a href="{{ route('admin.users.edit', $user) }}" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Editar</a>
                         @if($user->id !== auth()->id())
@@ -136,9 +136,9 @@
                                 @php
                                     $roleColors = [
                                         'admin' => 'bg-red-100 text-red-800',
-                                        'advogado' => 'bg-blue-100 text-blue-800',
-                                        'cliente' => 'bg-green-100 text-green-800',
-                                        'funcionario' => 'bg-yellow-100 text-yellow-800',
+                                        'membro' => 'bg-blue-100 text-blue-800',
+                                        'aluno' => 'bg-green-100 text-green-800',
+                                        'professor' => 'bg-yellow-100 text-yellow-800',
                                     ];
                                 @endphp
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }}">
@@ -160,7 +160,7 @@
                             <td class="px-6 py-4 text-right text-sm font-medium">
                                 <!-- Grupos action removed -->
                                 <a href="{{ route('admin.users.courses', $user) }}" class="text-blue-600 hover:text-blue-900 mr-3">Cursos</a>
-                                <a href="{{ route('admin.users.categories', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Categorias</a>
+                                <a href="{{ route('admin.users.categories', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Trilhas</a>
                                 <a href="{{ route('admin.users.lessons', $user) }}" class="text-purple-600 hover:text-purple-900 mr-3">Aulas</a>
                                 <a href="{{ route('admin.users.edit', $user) }}" class="text-yellow-600 hover:text-yellow-900 mr-3">Editar</a>
                                 @if($user->id !== auth()->id())

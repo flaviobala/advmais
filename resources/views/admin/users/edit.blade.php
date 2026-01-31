@@ -65,7 +65,7 @@
             </div>
 
             <div>
-                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Papel *</label>
+                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Perfil *</label>
                 <select id="role"
                         name="role"
                         required

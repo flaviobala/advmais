@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -31,9 +32,15 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:5000',
+            'description' => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
             'order' => 'nullable|integer|min:0',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')
+                ->store('categories', 'public');
+        }
 
         $data['slug'] = Str::slug($data['name']);
         $data['is_active'] = $request->has('is_active');
@@ -42,11 +49,18 @@ class CategoryController extends Controller
         Category::create($data);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoria criada com sucesso!');
+            ->with('success', 'Trilha criada com sucesso!');
+    }
+
+    public function show(Category $category)
+    {
+        $category->load(['courses' => fn($q) => $q->withCount('lessons')->orderBy('title')]);
+        return view('admin.categories.show', compact('category'));
     }
 
     public function edit(Category $category)
     {
+        $category->load(['courses' => fn($q) => $q->withCount('lessons')->orderBy('title')]);
         return view('admin.categories.edit', compact('category'));
     }
 
@@ -54,9 +68,25 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:5000',
+            'description' => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
             'order' => 'nullable|integer|min:0',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            if ($category->cover_image) {
+                Storage::disk('public')->delete($category->cover_image);
+            }
+            $data['cover_image'] = $request->file('cover_image')
+                ->store('categories', 'public');
+        }
+
+        if ($request->has('remove_cover_image') && !$request->hasFile('cover_image')) {
+            if ($category->cover_image) {
+                Storage::disk('public')->delete($category->cover_image);
+            }
+            $data['cover_image'] = null;
+        }
 
         $data['slug'] = Str::slug($data['name']);
         $data['is_active'] = $request->has('is_active');
@@ -64,7 +94,7 @@ class CategoryController extends Controller
         $category->update($data);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoria atualizada com sucesso!');
+            ->with('success', 'Trilha atualizada com sucesso!');
     }
 
     public function destroy(Category $category)
@@ -73,7 +103,7 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoria excluída com sucesso!');
+            ->with('success', 'Trilha excluída com sucesso!');
     }
 
     public function toggleActive(Category $category)
@@ -82,6 +112,6 @@ class CategoryController extends Controller
 
         $status = $category->is_active ? 'ativada' : 'desativada';
 
-        return redirect()->back()->with('success', "Categoria {$status} com sucesso!");
+        return redirect()->back()->with('success', "Trilha {$status} com sucesso!");
     }
 }

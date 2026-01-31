@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Course extends Model
 {
@@ -16,17 +17,26 @@ class Course extends Model
         'title',
         'description',
         'cover_image',
+        'thumbnail',
         'course_video',
         'is_active',
         'category_id',
+        'is_approved',
+        'created_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_approved' => 'boolean',
     ];
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     /**
-     * Relacionamento: Um curso pertence a uma categoria (opcional).
+     * Relacionamento: Um curso pertence a uma trilha (opcional).
      */
     public function category(): BelongsTo
     {
@@ -36,6 +46,11 @@ class Course extends Model
     /**
      * Relacionamento: Um curso tem muitas aulas.
      */
+    public function modules(): HasMany
+    {
+        return $this->hasMany(Module::class)->orderBy('order');
+    }
+
     public function lessons(): HasMany
     {
         return $this->hasMany(Lesson::class)->orderBy('order');
@@ -44,7 +59,10 @@ class Course extends Model
     /**
      * Relacionamento: Um curso pertence a muitos grupos (turmas).
      */
-    // groups removed
+    public function materials(): MorphMany
+    {
+        return $this->morphMany(Material::class, 'materialable')->orderBy('order');
+    }
 
     /**
      * Scope: Filtra apenas cursos ativos.

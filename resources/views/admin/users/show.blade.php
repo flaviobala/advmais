@@ -21,7 +21,7 @@
                 <div class="p-4 flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-900">{{ $course->title }}</p>
-                        <p class="text-xs text-gray-500">{{ $course->category->name ?? 'Sem categoria' }}</p>
+                        <p class="text-xs text-gray-500">{{ $course->category->name ?? 'Sem trilha' }}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         @if($course->access === 'full')

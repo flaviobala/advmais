@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\LoginController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\CourseController;
+use App\Http\Controllers\Web\TrilhaController;
+use App\Http\Controllers\Web\AboutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +36,12 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard (Agora usando o Controller correto)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Trilhas
+    Route::get('/trilhas/{id}', [TrilhaController::class, 'show'])->name('trilhas.show');
+
+    // ADV+CONECTA
+    Route::get('/sobre', [AboutController::class, 'index'])->name('about');
 
     // Cursos
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');

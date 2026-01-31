@@ -20,12 +20,18 @@ class CourseController extends Controller
         $hasPartialAccess = $user->hasPartialAccessToCourse($id);
 
         if (!$hasFullAccess && !$hasPartialAccess) {
-            abort(403, 'Você não tem permissão para acessar este curso.');
+            return redirect()->route('dashboard')
+                ->with('error', 'Você não tem acesso a este curso. Entre em contato com o administrador.');
         }
 
-        $course = Course::with(['lessons' => function($query) {
-            $query->orderBy('order');
-        }])
+        $course = Course::where('is_approved', true)
+        ->with([
+            'modules' => fn($q) => $q->where('is_active', true)->orderBy('order'),
+            'modules.lessons' => fn($q) => $q->orderBy('order'),
+            'modules.materials' => fn($q) => $q->orderBy('order'),
+            'lessons' => fn($q) => $q->orderBy('order'),
+            'materials' => fn($q) => $q->orderBy('order'),
+        ])
         ->findOrFail($id);
 
         $accessibleLessonIds = $user->getAccessibleLessonIdsForCourse($id);
@@ -33,11 +39,16 @@ class CourseController extends Controller
         $course->progress = $course->getProgressForUser($user->id);
         $course->has_full_access = $hasFullAccess;
 
-        $course->lessons->each(function($lesson) use ($user, $accessibleLessonIds) {
+        $attachProgress = function($lesson) use ($user, $accessibleLessonIds) {
             $lesson->is_accessible = in_array($lesson->id, $accessibleLessonIds);
             $userLesson = $user->lessons()->where('lesson_id', $lesson->id)->first();
             $lesson->is_completed = $userLesson ? $userLesson->pivot->is_completed : false;
             $lesson->progress_percentage = $userLesson ? $userLesson->pivot->progress_percentage : 0;
+        };
+
+        $course->lessons->each($attachProgress);
+        $course->modules->each(function($module) use ($attachProgress) {
+            $module->lessons->each($attachProgress);
         });
 
         return view('courses.show', compact('course', 'user'));
@@ -51,7 +62,8 @@ class CourseController extends Controller
         $user = auth()->user();
 
         if (!$user->hasAccessToLesson($lessonId)) {
-            abort(403, 'Você não tem permissão para acessar esta aula.');
+            return redirect()->route('courses.show', $courseId)
+                ->with('error', 'Você não tem acesso a esta aula.');
         }
 
         $course = Course::findOrFail($courseId);

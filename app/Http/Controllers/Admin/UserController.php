@@ -32,14 +32,14 @@ class UserController extends Controller
 
         $users = $query->orderBy('name')->paginate(15);
 
-        $roles = ['admin', 'advogado', 'cliente', 'funcionario'];
+        $roles = ['admin', 'membro', 'aluno', 'professor'];
 
         return view('admin.users.index', compact('users', 'roles'));
     }
 
     public function create()
     {
-        $roles = ['admin', 'advogado', 'cliente', 'funcionario'];
+        $roles = ['admin', 'membro', 'aluno', 'professor'];
         return view('admin.users.create', compact('roles'));
     }
 
@@ -57,7 +57,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = ['admin', 'advogado', 'cliente', 'funcionario'];
+        $roles = ['admin', 'membro', 'aluno', 'professor'];
         return view('admin.users.edit', compact('user', 'roles'));
     }
 

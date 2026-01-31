@@ -16,7 +16,9 @@ class UpdateLessonRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'module_id' => 'nullable|exists:modules,id',
             'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
             'order' => 'required|integer|min:0',
             'video_provider' => ['nullable', Rule::enum(VideoProvider::class), 'required_without:attachment'],
             'video_ref_id' => ['nullable', 'string', 'max:255', 'required_without:attachment'],
