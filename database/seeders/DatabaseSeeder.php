@@ -13,55 +13,75 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Criar Cursos
-        $cursoPenal = Course::create([
-            'title' => 'Direito Penal Avançado',
-            'description' => 'Curso preparatório para segunda fase.',
-        ]);
+        // 1. Criar Cursos (apenas se não existirem)
+        $cursoPenal = Course::firstOrCreate(
+            ['title' => 'Direito Penal Avançado'],
+            ['description' => 'Curso preparatório para segunda fase.']
+        );
 
-        $cursoMkt = Course::create([
-            'title' => 'Marketing Jurídico na Prática',
-            'description' => 'Como conseguir clientes sem ferir o código de ética.',
-        ]);
+        $cursoMkt = Course::firstOrCreate(
+            ['title' => 'Marketing Jurídico na Prática'],
+            ['description' => 'Como conseguir clientes sem ferir o código de ética.']
+        );
 
-        // 3. Criar Aulas (Lessons)
-        Lesson::create([
-            'course_id' => $cursoPenal->id,
-            'title' => 'Aula 01 - Teoria do Crime',
-            'video_provider' => VideoProvider::YOUTUBE, 
-            'video_ref_id' => 'dQw4w9WgXcQ', // ID de teste do Youtube
-            'order' => 1
-        ]);
+        // 3. Criar Aulas (apenas se não existirem)
+        Lesson::firstOrCreate(
+            [
+                'course_id' => $cursoPenal->id,
+                'title' => 'Aula 01 - Teoria do Crime',
+            ],
+            [
+                'video_provider' => VideoProvider::YOUTUBE, 
+                'video_ref_id' => 'dQw4w9WgXcQ',
+                'order' => 1
+            ]
+        );
 
-        Lesson::create([
-            'course_id' => $cursoMkt->id,
-            'title' => 'Aula 01 - Posicionamento no Instagram',
-            'video_provider' => VideoProvider::VIMEO,
-            'video_ref_id' => '76979871', // ID de teste do Vimeo
-            'order' => 1
-        ]);
+        Lesson::firstOrCreate(
+            [
+                'course_id' => $cursoMkt->id,
+                'title' => 'Aula 01 - Posicionamento no Instagram',
+            ],
+            [
+                'video_provider' => VideoProvider::VIMEO,
+                'video_ref_id' => '76979871',
+                'order' => 1
+            ]
+        );
 
         // 4. Criar Usuários de Teste
         // Usuário ADMIN (Vê tudo - futuramente)
-        User::create([
-            'name' => 'Admin AdvMais',
-            'email' => 'admin@advmais.local',
-            'password' => Hash::make('12345678'),
-            'role' => 'admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@advmais.local'],
+            [
+                'name' => 'Admin AdvMais',
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+            ]
+        );
 
         // Aluno OAB (Só deve ver Penal)
-        User::create([
-            'name' => 'Dr. João',
-            'email' => 'joao@oab.teste',
-            'password' => Hash::make('12345678'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'joao@oab.teste'],
+            [
+                'name' => 'Dr. João',
+                'password' => Hash::make('12345678'),
+                'role' => 'aluno',
+            ]
+        );
 
-        User::create([
-            'name' => 'Dra. Maria',
-            'email' => 'maria@vip.teste',
-            'password' => Hash::make('12345678'),
+        User::firstOrCreate(
+            ['email' => 'maria@vip.teste'],
+            [
+                'name' => 'Dra. Maria',
+                'password' => Hash::make('12345678'),
+                'role' => 'aluno',
+            ]
+        );
+        
+        $this->call([
+            CategorySeeder::class,
+            CourseSeeder::class,
         ]);
-        $this->call(CourseSeeder::class);
     }
 }
