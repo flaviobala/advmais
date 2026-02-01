@@ -43,25 +43,33 @@ class DatabaseSeeder extends Seeder
 
         // 4. Criar Usuários de Teste
         // Usuário ADMIN (Vê tudo - futuramente)
-        User::create([
-            'name' => 'Admin AdvMais',
-            'email' => 'admin@advmais.local',
-            'password' => Hash::make('12345678'),
-            'role' => 'admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@advmais.local'],
+            [
+                'name' => 'Admin AdvMais',
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+            ]
+        );
 
         // Aluno OAB (Só deve ver Penal)
-        User::create([
-            'name' => 'Dr. João',
-            'email' => 'joao@oab.teste',
-            'password' => Hash::make('12345678'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'joao@oab.teste'],
+            [
+                'name' => 'Dr. João',
+                'password' => Hash::make('12345678'),
+                'role' => 'aluno',
+            ]
+        );
 
-        User::create([
-            'name' => 'Dra. Maria',
-            'email' => 'maria@vip.teste',
-            'password' => Hash::make('12345678'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'maria@vip.teste'],
+            [
+                'name' => 'Dra. Maria',
+                'password' => Hash::make('12345678'),
+                'role' => 'aluno',
+            ]
+        );
         $this->call(CourseSeeder::class);
     }
 }
