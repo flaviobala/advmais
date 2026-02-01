@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\AboutSetting;
 use App\Models\Category;
 use App\Models\Course;
 
@@ -62,6 +63,8 @@ class DashboardController extends Controller
                 return $course;
             });
 
-        return view('dashboard', compact('categories', 'orphanCourses', 'user'));
+        $aboutSettings = AboutSetting::instance();
+
+        return view('dashboard', compact('categories', 'orphanCourses', 'user', 'aboutSettings'));
     }
 }

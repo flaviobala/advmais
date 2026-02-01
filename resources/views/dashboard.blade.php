@@ -25,6 +25,25 @@
         @if($categories->isNotEmpty())
             <h2 class="text-xl font-bold text-gray-900 mb-4">Trilhas de Aprendizado</h2>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 mb-10">
+                {{-- Card ADV+CONECTA --}}
+                <a href="{{ route('about') }}" class="group block bg-white rounded-lg shadow hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
+                    <div class="aspect-video bg-gradient-to-br from-purple-500 to-blue-600 relative overflow-hidden">
+                        @if($aboutSettings->card_image)
+                            <img src="{{ Storage::url($aboutSettings->card_image) }}" alt="ADV+CONECTA" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg class="w-12 h-12 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-tight">ADV+CONECTA</h3>
+                        <p class="text-xs text-purple-500 mt-1">Saiba mais</p>
+                    </div>
+                </a>
+
                 @foreach($categories as $category)
                     @if($category->is_locked)
                         <div class="group block bg-white rounded-lg shadow overflow-hidden opacity-90">

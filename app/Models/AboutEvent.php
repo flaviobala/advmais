@@ -22,12 +22,12 @@ class AboutEvent extends Model
 
         // YouTube
         if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $this->video_url, $matches)) {
-            return 'https://www.youtube.com/embed/' . $matches[1];
+            return 'https://www.youtube.com/embed/' . $matches[1] . '?rel=0&modestbranding=1';
         }
 
         // Vimeo
         if (preg_match('/vimeo\.com\/(\d+)/', $this->video_url, $matches)) {
-            return 'https://player.vimeo.com/video/' . $matches[1];
+            return 'https://player.vimeo.com/video/' . $matches[1] . '?byline=0&portrait=0';
         }
 
         return null;

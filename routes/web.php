@@ -31,6 +31,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
 
+// --- PÚBLICO ---
+Route::get('/sobre', [AboutController::class, 'index'])->name('about');
+
 // --- LOGADOS (AUTH) ---
 Route::middleware('auth')->group(function () {
 
@@ -39,9 +42,6 @@ Route::middleware('auth')->group(function () {
 
     // Trilhas
     Route::get('/trilhas/{id}', [TrilhaController::class, 'show'])->name('trilhas.show');
-
-    // ADV+CONECTA
-    Route::get('/sobre', [AboutController::class, 'index'])->name('about');
 
     // Cursos
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');

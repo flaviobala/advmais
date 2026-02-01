@@ -1,10 +1,48 @@
 <x-admin-layout title="ADV+CONECTA">
 
-    @if(session('success'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-            {{ session('success') }}
+    {{-- Seção: Introdução --}}
+    <div class="bg-white rounded-lg shadow mb-6">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Introdução</h2>
+            <p class="text-sm text-gray-500">Vídeo de abertura e texto sobre a comunidade ADV+CONECTA</p>
         </div>
-    @endif
+        <div class="p-4">
+            <form action="{{ route('admin.about.intro.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Imagem do Card no Dashboard</label>
+                    <p class="text-xs text-gray-400 mb-1">Esta imagem aparece no painel do aluno, antes das trilhas, como atalho para o ADV+CONECTA.</p>
+                    @if($settings->card_image)
+                        <div class="flex items-center gap-3 mb-2">
+                            <img src="{{ Storage::url($settings->card_image) }}" class="w-32 h-20 rounded object-cover">
+                            <label class="flex items-center gap-2 text-xs text-red-600 cursor-pointer">
+                                <input type="checkbox" name="remove_card_image" value="1"> Remover imagem
+                            </label>
+                        </div>
+                    @endif
+                    <input type="file" name="card_image" accept="image/png,image/jpeg,image/webp"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Link do Vídeo de Abertura (YouTube ou Vimeo)</label>
+                    <input type="url" name="intro_video_url" value="{{ $settings->intro_video_url }}"
+                           placeholder="https://youtube.com/watch?v=..."
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Texto sobre a Comunidade</label>
+                    <textarea name="intro_text" rows="5" placeholder="Descreva o que é o ADV+CONECTA, sua missão, valores..."
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">{{ $settings->intro_text }}</textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm">
+                        Salvar Introdução
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {{-- Seção: Eventos --}}
     <div class="bg-white rounded-lg shadow">
@@ -55,8 +93,8 @@
 
         <div class="divide-y divide-gray-200">
             @forelse($events as $event)
-                <div class="p-4 flex items-center justify-between hover:bg-gray-50">
-                    <div class="flex items-center gap-4 min-w-0">
+                <div class="p-4">
+                    <div class="flex items-start gap-4">
                         @if($event->photo)
                             <img src="{{ Storage::url($event->photo) }}" alt="{{ $event->title }}" class="w-20 h-12 rounded object-cover flex-shrink-0">
                         @else
@@ -66,21 +104,64 @@
                                 </svg>
                             </div>
                         @endif
-                        <div class="min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate">{{ $event->title }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">{{ $event->title }}</p>
                             @if($event->description)
-                                <p class="text-xs text-gray-500 truncate">{{ $event->description }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ $event->description }}</p>
                             @endif
                             @if($event->video_url)
-                                <a href="{{ $event->video_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">Ver vídeo</a>
+                                <a href="{{ $event->video_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-block">Ver vídeo</a>
                             @endif
                         </div>
+                        <div class="flex items-center gap-3 flex-shrink-0 ml-4">
+                            <button type="button" onclick="document.getElementById('edit-event-{{ $event->id }}').classList.toggle('hidden')"
+                                    class="text-xs text-yellow-600 hover:text-yellow-900 font-medium px-2 py-1 rounded hover:bg-yellow-50">Editar</button>
+                            <form action="{{ route('admin.about.events.destroy', $event) }}" method="POST" class="inline-flex" onsubmit="return confirm('Excluir este evento?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-900 text-xs font-medium px-2 py-1 rounded hover:bg-red-50">Excluir</button>
+                            </form>
+                        </div>
                     </div>
-                    <form action="{{ route('admin.about.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Excluir este evento?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:text-red-900 text-xs font-medium">Excluir</button>
-                    </form>
+
+                    {{-- Formulário de edição inline --}}
+                    <div id="edit-event-{{ $event->id }}" class="hidden mt-3 p-3 bg-yellow-50 rounded-lg">
+                        <form action="{{ route('admin.about.events.update', $event) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                            @csrf
+                            @method('PUT')
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Título</label>
+                                    <input type="text" name="title" value="{{ $event->title }}" required
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Link do Vídeo</label>
+                                    <input type="url" name="video_url" value="{{ $event->video_url }}"
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Descrição</label>
+                                <textarea name="description" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">{{ $event->description }}</textarea>
+                            </div>
+                            <div class="flex items-end gap-3">
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Nova Foto</label>
+                                    <input type="file" name="photo" accept="image/png,image/jpeg,image/webp"
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+                                    @if($event->photo)
+                                        <label class="flex items-center gap-2 mt-1 text-xs text-red-600 cursor-pointer">
+                                            <input type="checkbox" name="remove_photo" value="1"> Remover foto atual
+                                        </label>
+                                    @endif
+                                </div>
+                                <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg text-sm whitespace-nowrap">
+                                    Salvar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             @empty
                 <div class="p-8 text-center text-gray-500">

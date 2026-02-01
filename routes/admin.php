@@ -67,7 +67,9 @@ Route::prefix('admin')
 
             // ADV+CONECTA (Sobre)
             Route::get('about', [AboutController::class, 'index'])->name('about.index');
+            Route::put('about/intro', [AboutController::class, 'updateIntro'])->name('about.intro.update');
             Route::post('about/events', [AboutController::class, 'storeEvent'])->name('about.events.store');
+            Route::put('about/events/{event}', [AboutController::class, 'updateEvent'])->name('about.events.update');
             Route::delete('about/events/{event}', [AboutController::class, 'destroyEvent'])->name('about.events.destroy');
             Route::post('about/founders', [AboutController::class, 'storeFounder'])->name('about.founders.store');
             Route::put('about/founders/{founder}', [AboutController::class, 'updateFounder'])->name('about.founders.update');
