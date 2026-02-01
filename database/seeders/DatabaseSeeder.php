@@ -78,6 +78,10 @@ class DatabaseSeeder extends Seeder
                 'role' => 'aluno',
             ]
         );
-        $this->call(CourseSeeder::class);
+        
+        $this->call([
+            CategorySeeder::class,
+            CourseSeeder::class,
+        ]);
     }
 }
