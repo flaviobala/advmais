@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Course;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -32,6 +33,13 @@ class CategorySeeder extends Seeder
                 ['slug' => $category['slug']],
                 $category
             );
+        }
+
+        // Associar cursos às categorias
+        $tecnologia = Category::where('slug', 'tecnologia')->first();
+        if ($tecnologia) {
+            // Associar cursos de tecnologia (Laravel, etc)
+            Course::where('title', 'LIKE', '%Laravel%')->update(['category_id' => $tecnologia->id]);
         }
 
         $this->command->info('Categorias criadas com sucesso!');
