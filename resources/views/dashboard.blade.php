@@ -1,9 +1,24 @@
-<x-layout title="Painel do Aluno">
+@php
+    $panelTitles = [
+        'admin' => 'Painel do Administrador',
+        'professor' => 'Painel do Professor',
+        'membro' => 'Painel do Membro',
+        'aluno' => 'Painel do Aluno',
+    ];
+    $panelTitle = $panelTitles[$user->role] ?? 'Painel';
+@endphp
+
+<x-layout :title="$panelTitle">
 
     <!-- Mensagem de boas-vindas -->
-    <div class="mb-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-        <h2 class="text-2xl font-bold mb-2">Ol&aacute;, {{ $user->name }}!</h2>
-        <p class="text-blue-100">Bem-vindo de volta. Continue aprendendo e evoluindo!</p>
+    <div class="mb-8 relative overflow-hidden rounded-xl shadow-2xl bg-black p-6 border border-white/10">
+        {{-- Efeito degradê sutil --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-white/5 via-transparent to-white/5"></div>
+
+        <div class="relative">
+            <h2 class="text-2xl font-semibold mb-1 text-white">Ol&aacute;, {{ $user->name }}!</h2>
+            <p class="text-white/60 text-sm">Bem-vindo de volta. Continue aprendendo e evoluindo!</p>
+        </div>
     </div>
 
     @if(session('error'))
