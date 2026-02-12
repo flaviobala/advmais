@@ -2,10 +2,7 @@
 
     {{-- Seção: Introdução --}}
     <div class="bg-white rounded-lg shadow mb-6">
-        <div class="p-6 border-b border-gray-200">
-            <h2 class="text-lg font-medium text-gray-900">Introdução</h2>
-            <p class="text-sm text-gray-500">Vídeo de abertura e texto sobre a comunidade ADV+CONECTA</p>
-        </div>
+        <div class="p-4 border-b border-gray-200"></div>
         <div class="p-4">
             <form action="{{ route('admin.about.intro.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
@@ -32,6 +29,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">Texto sobre a Comunidade</label>
+                    <p class="text-xs text-gray-400 mb-1">Use **palavra** para deixar em <strong>negrito</strong>.</p>
                     <textarea name="intro_text" rows="5" placeholder="Descreva o que é o ADV+CONECTA, sua missão, valores..."
                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">{{ $settings->intro_text }}</textarea>
                 </div>
