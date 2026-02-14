@@ -42,6 +42,7 @@ Route::prefix('admin')
         Route::post('lessons/reorder', [LessonController::class, 'reorder'])->name('lessons.reorder');
 
         // Materiais complementares (admin + professor)
+        Route::get('materials', fn () => redirect()->route('admin.courses.index'))->name('materials.index');
         Route::post('materials', [MaterialController::class, 'store'])->name('materials.store');
         Route::delete('materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
 
