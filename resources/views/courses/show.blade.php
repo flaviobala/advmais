@@ -120,8 +120,13 @@
                                 @foreach($module->materials as $material)
                                     <a href="{{ $material->type === 'link' ? $material->url : Storage::url($material->filepath) }}"
                                        target="_blank"
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 rounded-lg text-xs text-gray-700 hover:bg-blue-100 transition-colors">
-                                        <span class="flex-shrink-0 [&_svg]:w-4 [&_svg]:h-4">{!! $material->icon !!}</span>
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 rounded-lg text-xs text-gray-700 hover:bg-blue-100 transition-colors"
+                                       @if($material->description) title="{{ $material->description }}" @endif>
+                                        @if($material->cover_image)
+                                            <img src="{{ Storage::url($material->cover_image) }}" alt="" class="w-6 h-6 rounded object-cover flex-shrink-0">
+                                        @else
+                                            <span class="flex-shrink-0 [&_svg]:w-4 [&_svg]:h-4">{!! $material->icon !!}</span>
+                                        @endif
                                         {{ $material->title ?? $material->filename }}
                                     </a>
                                 @endforeach
@@ -168,9 +173,16 @@
                         <a href="{{ $material->type === 'link' ? $material->url : Storage::url($material->filepath) }}"
                            target="_blank"
                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
-                            {!! $material->icon !!}
+                            @if($material->cover_image)
+                                <img src="{{ Storage::url($material->cover_image) }}" alt="" class="w-12 h-12 rounded object-cover flex-shrink-0">
+                            @else
+                                {!! $material->icon !!}
+                            @endif
                             <div class="min-w-0">
                                 <p class="text-sm font-medium text-gray-900">{{ $material->title ?? $material->filename }}</p>
+                                @if($material->description)
+                                    <p class="text-xs text-gray-600">{{ $material->description }}</p>
+                                @endif
                                 @if($material->type === 'file')
                                     <p class="text-xs text-gray-400">{{ $material->formatted_size }} &bull; {{ strtoupper($material->filetype) }}</p>
                                 @else

@@ -20,6 +20,8 @@ class MaterialController extends Controller
             'files.*' => 'file|max:51200',
             'link_title' => 'nullable|string|max:255',
             'link_url' => 'nullable|url|max:500',
+            'cover_image' => 'nullable|image|max:2048',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         $type = $request->input('materialable_type');
@@ -39,9 +41,17 @@ class MaterialController extends Controller
 
         $maxOrder = $parent->materials()->max('order') ?? -1;
 
+        // Upload de capa (compartilhada entre arquivos e links)
+        $coverPath = null;
+        if ($request->hasFile('cover_image')) {
+            $coverPath = $request->file('cover_image')->store('materials/covers', 'public');
+        }
+
+        $description = $request->input('description');
+
         // Upload de arquivos
         if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
+            foreach ($request->file('files') as $index => $file) {
                 $maxOrder++;
                 $filepath = $file->store($storagePath, 'public');
 
@@ -54,6 +64,8 @@ class MaterialController extends Controller
                     'filepath' => $filepath,
                     'filetype' => Material::detectType($file->getClientOriginalName()),
                     'filesize' => $file->getSize(),
+                    'cover_image' => $index === 0 ? $coverPath : null,
+                    'description' => $index === 0 ? $description : null,
                     'order' => $maxOrder,
                 ]);
             }
@@ -68,6 +80,8 @@ class MaterialController extends Controller
                 'type' => 'link',
                 'title' => $request->input('link_title') ?: $request->input('link_url'),
                 'url' => $request->input('link_url'),
+                'cover_image' => $coverPath,
+                'description' => $description,
                 'order' => $maxOrder,
             ]);
         }
@@ -85,6 +99,10 @@ class MaterialController extends Controller
 
         if ($material->type === 'file' && $material->filepath) {
             Storage::disk('public')->delete($material->filepath);
+        }
+
+        if ($material->cover_image) {
+            Storage::disk('public')->delete($material->cover_image);
         }
 
         $material->delete();

@@ -18,6 +18,8 @@ class Material extends Model
         'filetype',
         'filesize',
         'url',
+        'cover_image',
+        'description',
         'order',
     ];
 

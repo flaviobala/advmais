@@ -351,13 +351,20 @@
                             @foreach($module->materials as $material)
                                 <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
                                     <div class="flex items-center gap-2 min-w-0">
-                                        <div class="flex-shrink-0 [&_svg]:w-5 [&_svg]:h-5">{!! $material->icon !!}</div>
+                                        @if($material->cover_image)
+                                            <img src="{{ Storage::url($material->cover_image) }}" alt="" class="w-8 h-8 rounded object-cover flex-shrink-0">
+                                        @else
+                                            <div class="flex-shrink-0 [&_svg]:w-5 [&_svg]:h-5">{!! $material->icon !!}</div>
+                                        @endif
                                         <div class="min-w-0">
                                             @if($material->type === 'link')
                                                 <a href="{{ $material->url }}" target="_blank" class="text-xs font-medium text-blue-600 hover:text-blue-800 truncate block">{{ $material->title }}</a>
                                             @else
                                                 <a href="{{ Storage::url($material->filepath) }}" target="_blank" class="text-xs font-medium text-gray-900 hover:text-blue-600 truncate block">{{ $material->filename }}</a>
                                                 <p class="text-xs text-gray-400">{{ $material->formatted_size }}</p>
+                                            @endif
+                                            @if($material->description)
+                                                <p class="text-xs text-gray-500 truncate">{{ $material->description }}</p>
                                             @endif
                                         </div>
                                     </div>
@@ -369,22 +376,35 @@
                                 </div>
                             @endforeach
 
-                            <form action="{{ route('admin.materials.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-wrap items-end gap-2 pt-2">
+                            <form action="{{ route('admin.materials.store') }}" method="POST" enctype="multipart/form-data" class="space-y-2 pt-2">
                                 @csrf
                                 <input type="hidden" name="materialable_type" value="module">
                                 <input type="hidden" name="materialable_id" value="{{ $module->id }}">
-                                <div class="flex-1 min-w-[200px]">
-                                    <input type="file" name="files[]" multiple
-                                           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.mp3,.mp4,.jpg,.jpeg,.png,.webp"
-                                           class="w-full border border-gray-300 rounded px-2 py-1 text-xs bg-white">
+                                <div class="flex flex-wrap items-end gap-2">
+                                    <div class="flex-1 min-w-[200px]">
+                                        <input type="file" name="files[]" multiple
+                                               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.mp3,.mp4,.jpg,.jpeg,.png,.webp"
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-xs bg-white">
+                                    </div>
+                                    <div class="flex-1 min-w-[150px]">
+                                        <input type="url" name="link_url" placeholder="ou cole um link..."
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-xs">
+                                    </div>
                                 </div>
-                                <div class="flex-1 min-w-[150px]">
-                                    <input type="url" name="link_url" placeholder="ou cole um link..."
-                                           class="w-full border border-gray-300 rounded px-2 py-1 text-xs">
+                                <div class="flex flex-wrap items-end gap-2">
+                                    <div class="flex-1 min-w-[150px]">
+                                        <input type="file" name="cover_image" accept="image/*"
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-xs bg-white">
+                                        <p class="text-xs text-gray-400 mt-0.5">Capa (opcional)</p>
+                                    </div>
+                                    <div class="flex-1 min-w-[200px]">
+                                        <input type="text" name="description" placeholder="Descrição (opcional)"
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-xs">
+                                    </div>
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium py-1 px-3 rounded">
+                                        Adicionar
+                                    </button>
                                 </div>
-                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium py-1 px-3 rounded">
-                                    Adicionar
-                                </button>
                             </form>
                         </div>
                     </div>
@@ -462,7 +482,11 @@
                     @foreach($course->materials as $material)
                         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div class="flex items-center gap-3 min-w-0">
-                                {!! $material->icon !!}
+                                @if($material->cover_image)
+                                    <img src="{{ Storage::url($material->cover_image) }}" alt="" class="w-12 h-12 rounded object-cover flex-shrink-0">
+                                @else
+                                    {!! $material->icon !!}
+                                @endif
                                 <div class="min-w-0">
                                     @if($material->type === 'link')
                                         <a href="{{ $material->url }}" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 truncate block">{{ $material->title }}</a>
@@ -470,6 +494,9 @@
                                     @else
                                         <a href="{{ Storage::url($material->filepath) }}" target="_blank" class="text-sm font-medium text-gray-900 hover:text-blue-600 truncate block">{{ $material->filename }}</a>
                                         <p class="text-xs text-gray-400">{{ $material->formatted_size }} &bull; {{ strtoupper($material->filetype) }}</p>
+                                    @endif
+                                    @if($material->description)
+                                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ $material->description }}</p>
                                     @endif
                                 </div>
                             </div>
@@ -506,6 +533,20 @@
                         <label class="block text-xs font-medium text-gray-700 mb-1">&nbsp;</label>
                         <input type="url" name="link_url" placeholder="https://..."
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Capa (opcional)</label>
+                        <input type="file" name="cover_image" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+                        <p class="text-xs text-gray-400 mt-1">Imagem de capa do material &bull; Máx 2MB</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Descrição (opcional)</label>
+                        <textarea name="description" rows="2" placeholder="Breve descrição do material..."
+                                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"></textarea>
                     </div>
                 </div>
 
