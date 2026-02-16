@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Lesson extends Model
 {
@@ -73,5 +74,10 @@ class Lesson extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(LessonAttachment::class)->orderBy('order');
+    }
+
+    public function materials(): MorphMany
+    {
+        return $this->morphMany(Material::class, 'materialable')->orderBy('order');
     }
 }

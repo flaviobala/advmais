@@ -69,6 +69,7 @@ class CourseController extends Controller
         $course = Course::findOrFail($courseId);
         $lesson = Lesson::where('course_id', $courseId)
             ->where('id', $lessonId)
+            ->with('materials')
             ->firstOrFail();
 
         return view('courses.lesson', compact('course', 'lesson'));

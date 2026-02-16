@@ -180,6 +180,94 @@
         </form>
     </div>
 
+    {{-- Seção de Material Complementar da Aula --}}
+    <div class="bg-white rounded-lg shadow mt-6">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Material Complementar da Aula</h2>
+            <p class="text-sm text-gray-500">Arquivos e links disponíveis para os alunos desta aula</p>
+        </div>
+
+        <div class="p-6 space-y-4">
+            @if($lesson->materials->count() > 0)
+                <div class="space-y-2">
+                    @foreach($lesson->materials as $material)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center gap-3 min-w-0">
+                                @if($material->cover_image)
+                                    <img src="{{ Storage::url($material->cover_image) }}" alt="" class="w-12 h-12 rounded object-cover flex-shrink-0">
+                                @else
+                                    {!! $material->icon !!}
+                                @endif
+                                <div class="min-w-0">
+                                    @if($material->type === 'link')
+                                        <a href="{{ $material->url }}" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 truncate block">{{ $material->title }}</a>
+                                        <p class="text-xs text-gray-400 truncate">{{ $material->url }}</p>
+                                    @else
+                                        <a href="{{ Storage::url($material->filepath) }}" target="_blank" class="text-sm font-medium text-gray-900 hover:text-blue-600 truncate block">{{ $material->filename }}</a>
+                                        <p class="text-xs text-gray-400">{{ $material->formatted_size }} &bull; {{ strtoupper($material->filetype) }}</p>
+                                    @endif
+                                    @if($material->description)
+                                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ $material->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            <form action="{{ route('admin.materials.destroy', $material) }}" method="POST" onsubmit="return confirm('Excluir este material?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-medium">Excluir</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            <form action="{{ route('admin.materials.store') }}" method="POST" enctype="multipart/form-data" class="space-y-3 pt-2 border-t border-gray-200">
+                @csrf
+                <input type="hidden" name="materialable_type" value="lesson">
+                <input type="hidden" name="materialable_id" value="{{ $lesson->id }}">
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Enviar arquivos</label>
+                    <input type="file" name="files[]" multiple
+                           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.mp3,.mp4,.jpg,.jpeg,.png,.webp"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+                    <p class="text-xs text-gray-400 mt-1">PDF, Word, Excel, PowerPoint, imagens, áudio, vídeo, ZIP &bull; Máx 50MB por arquivo</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Ou adicionar link</label>
+                        <input type="text" name="link_title" placeholder="Título do link"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">&nbsp;</label>
+                        <input type="url" name="link_url" placeholder="https://..."
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Capa (opcional)</label>
+                        <input type="file" name="cover_image" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+                        <p class="text-xs text-gray-400 mt-1">Imagem de capa do material &bull; Máx 2MB</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Descrição (opcional)</label>
+                        <textarea name="description" rows="2" placeholder="Breve descrição do material..."
+                                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                    Adicionar Material
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Attachments preview
         document.getElementById('attachments').addEventListener('change', function(e) {

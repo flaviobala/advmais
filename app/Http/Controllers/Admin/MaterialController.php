@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Material;
 use App\Models\Course;
+use App\Models\Lesson;
 use App\Models\Module;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,7 @@ class MaterialController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'materialable_type' => 'required|in:course,module',
+            'materialable_type' => 'required|in:course,module,lesson',
             'materialable_id' => 'required|integer',
             'files' => 'nullable|array',
             'files.*' => 'file|max:51200',
@@ -32,6 +33,11 @@ class MaterialController extends Controller
             $this->authorizeCourse($parent);
             $morphType = Course::class;
             $storagePath = 'materials/courses';
+        } elseif ($type === 'lesson') {
+            $parent = Lesson::findOrFail($id);
+            $this->authorizeCourse($parent->course);
+            $morphType = Lesson::class;
+            $storagePath = 'materials/lessons';
         } else {
             $parent = Module::findOrFail($id);
             $this->authorizeCourse($parent->course);
