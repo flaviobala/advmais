@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Lesson;
 use App\Models\Payment;
 use App\Models\Subscription;
@@ -44,35 +45,53 @@ class WebhookController extends Controller
     {
         $payment = Payment::where('asaas_payment_id', $paymentData['id'])->first();
 
-        if (!$payment) {
-            Log::warning('Asaas Webhook: payment não encontrado', ['asaas_id' => $paymentData['id']]);
+        if ($payment) {
+            $payment->update([
+                'status'  => 'confirmed',
+                'paid_at' => now(),
+            ]);
+
+            $payable = $payment->payable;
+            $user    = $payment->user;
+
+            if (!$payable || !$user) {
+                return;
+            }
+
+            if ($payment->payable_type === \App\Models\Course::class) {
+                $user->courses()->syncWithoutDetaching([$payable->id]);
+            } elseif ($payment->payable_type === Lesson::class) {
+                $user->accessibleLessons()->syncWithoutDetaching([$payable->id]);
+            } elseif ($payment->payable_type === Category::class) {
+                // Pagamento da primeira mensalidade: ativa a assinatura
+                Subscription::where('user_id', $user->id)
+                    ->where('category_id', $payable->id)
+                    ->whereIn('status', ['pending', 'overdue'])
+                    ->update(['status' => 'active']);
+            }
+
+            Log::info('Asaas Webhook: acesso liberado', [
+                'user_id'      => $user->id,
+                'payable_type' => $payment->payable_type,
+                'payable_id'   => $payment->payable_id,
+            ]);
+
             return;
         }
 
-        $payment->update([
-            'status'  => 'confirmed',
-            'paid_at' => now(),
-        ]);
+        // Pagamento de renovação de assinatura (não tem registro em payments)
+        if (!empty($paymentData['subscription'])) {
+            $subscription = Subscription::where('asaas_subscription_id', $paymentData['subscription'])->first();
 
-        // Liberar acesso conforme o tipo de recurso comprado
-        $payable = $payment->payable;
-        $user    = $payment->user;
+            if ($subscription) {
+                $subscription->update(['status' => 'active']);
 
-        if (!$payable || !$user) {
-            return;
+                Log::info('Asaas Webhook: renovação de assinatura confirmada', [
+                    'subscription_id' => $subscription->id,
+                    'user_id'         => $subscription->user_id,
+                ]);
+            }
         }
-
-        if ($payment->payable_type === \App\Models\Course::class) {
-            $user->courses()->syncWithoutDetaching([$payable->id]);
-        } elseif ($payment->payable_type === Lesson::class) {
-            $user->accessibleLessons()->syncWithoutDetaching([$payable->id]);
-        }
-
-        Log::info('Asaas Webhook: acesso liberado', [
-            'user_id'      => $user->id,
-            'payable_type' => $payment->payable_type,
-            'payable_id'   => $payment->payable_id,
-        ]);
     }
 
     private function handlePaymentOverdue(array $paymentData): void

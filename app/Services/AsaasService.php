@@ -179,6 +179,24 @@ class AsaasService
     }
 
     /**
+     * Retorna o primeiro pagamento gerado para uma assinatura.
+     */
+    public function getSubscriptionFirstPayment(string $asaasSubscriptionId): ?array
+    {
+        $response = $this->http()->get("/subscriptions/{$asaasSubscriptionId}/payments", [
+            'limit' => 1,
+        ]);
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        $data = $response->json('data');
+
+        return !empty($data) ? $data[0] : null;
+    }
+
+    /**
      * Cancela uma assinatura pelo ID do Asaas.
      */
     public function cancelSubscription(string $asaasSubscriptionId): void
