@@ -56,7 +56,8 @@
                     </div>
                 </div>
 
-                <!-- Barra de Progresso -->
+                <!-- Barra de Progresso ou botão de compra -->
+                @if(auth()->user()->hasAccessToCourse($course->id))
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-xs font-medium text-gray-500">Progresso</span>
@@ -66,6 +67,18 @@
                         <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: {{ $course->progress }}%"></div>
                     </div>
                 </div>
+                @elseif($course->price)
+                <div class="flex items-center justify-between bg-blue-50 rounded-lg p-3">
+                    <div>
+                        <p class="text-xs text-gray-500">Acesso completo por apenas</p>
+                        <p class="text-xl font-bold text-green-600">R$ {{ number_format($course->price, 2, ',', '.') }}</p>
+                    </div>
+                    <a href="{{ route('checkout.course', $course) }}"
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg transition text-sm">
+                        Comprar acesso
+                    </a>
+                </div>
+                @endif
             </div>
         </div>
     </div>

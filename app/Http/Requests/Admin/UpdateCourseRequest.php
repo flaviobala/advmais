@@ -20,6 +20,7 @@ class UpdateCourseRequest extends FormRequest
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
             'course_video' => 'nullable|url|max:500',
+            'price' => 'nullable|numeric|min:0',
         ];
     }
 

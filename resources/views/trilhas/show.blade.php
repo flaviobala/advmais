@@ -41,7 +41,7 @@
             @if($category->description)
                 <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ $category->description }}</p>
             @endif
-            <div class="flex items-center gap-4 text-sm text-gray-500">
+            <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
                 <span class="flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -49,6 +49,24 @@
                     {{ $courses->count() }} {{ $courses->count() == 1 ? 'curso' : 'cursos' }}
                 </span>
             </div>
+
+            @if($category->price && !auth()->user()->hasActiveSubscription($category->id))
+                <div class="mt-auto flex items-center justify-between bg-blue-50 rounded-lg p-3">
+                    <div>
+                        <p class="text-xs text-gray-500">Acesso a todos os cursos por</p>
+                        <p class="text-xl font-bold text-green-600">R$ {{ number_format($category->price, 2, ',', '.') }}<span class="text-xs font-normal text-gray-400">/mês</span></p>
+                    </div>
+                    <a href="{{ route('subscription.show', $category) }}"
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg transition text-sm">
+                        Assinar
+                    </a>
+                </div>
+            @elseif($category->price && auth()->user()->hasActiveSubscription($category->id))
+                <div class="mt-auto bg-green-50 rounded-lg p-3">
+                    <p class="text-sm text-green-700 font-medium">✓ Assinatura ativa</p>
+                    <a href="{{ route('subscription.show', $category) }}" class="text-xs text-green-600 hover:underline">Gerenciar assinatura</a>
+                </div>
+            @endif
         </div>
     </div>
 

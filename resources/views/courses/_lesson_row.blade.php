@@ -28,7 +28,14 @@
 
         <div class="flex items-center gap-3">
             @if(!$lesson->is_accessible)
-                <span class="flex items-center gap-2 text-gray-400 font-medium text-sm">Bloqueada</span>
+                @if($lesson->price)
+                    <a href="{{ route('checkout.lesson', $lesson) }}"
+                       class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm transition">
+                        R$ {{ number_format($lesson->price, 2, ',', '.') }}
+                    </a>
+                @else
+                    <span class="flex items-center gap-2 text-gray-400 font-medium text-sm">Bloqueada</span>
+                @endif
             @elseif($lesson->is_completed)
                 <span class="flex items-center gap-2 text-green-600 font-medium text-sm">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
