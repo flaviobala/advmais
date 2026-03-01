@@ -228,6 +228,15 @@ class AsaasService
             return true; // sem token configurado, aceita tudo (só em sandbox)
         }
 
-        return $request->header('asaas-access-token') === $expectedToken;
+        $receivedToken = $request->header('asaas-access-token');
+
+        Log::info('Asaas Webhook token check', [
+            'expected' => $expectedToken,
+            'received' => $receivedToken,
+            'match'    => $receivedToken === $expectedToken,
+            'headers'  => $request->headers->all(),
+        ]);
+
+        return $receivedToken === $expectedToken;
     }
 }
