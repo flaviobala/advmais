@@ -40,8 +40,8 @@ return [
         'env'           => env('ASAAS_ENV', 'sandbox'),
         'webhook_token' => env('ASAAS_WEBHOOK_TOKEN'),
         'base_url'      => env('ASAAS_ENV', 'sandbox') === 'production'
-            ? 'https://api.asaas.com/api/v3'
-            : 'https://sandbox.asaas.com/api/v3',
+            ? 'https://api.asaas.com/v3'
+            : 'https://api-sandbox.asaas.com/v3',
     ],
 
     'platform' => [
