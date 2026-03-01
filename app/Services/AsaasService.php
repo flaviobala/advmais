@@ -32,19 +32,43 @@ class AsaasService
     // ─── Clientes ─────────────────────────────────────────────────────────────
 
     /**
-     * Cria um cliente no Asaas e retorna o asaas_customer_id.
-     * Se o usuário já tiver asaas_customer_id, retorna ele direto.
+     * Cria ou recupera um cliente no Asaas.
+     * Se $cpfCnpj for informado, salva no usuário e inclui na criação/atualização do cliente.
      */
-    public function getOrCreateCustomer(User $user): string
+    public function getOrCreateCustomer(User $user, ?string $cpfCnpj = null): string
     {
+        // Salva CPF no banco se ainda não tiver
+        if ($cpfCnpj && !$user->cpf_cnpj) {
+            $user->update(['cpf_cnpj' => $cpfCnpj]);
+            $user->refresh();
+        }
+
+        $cleanCpf = $user->cpf_cnpj
+            ? preg_replace('/\D/', '', $user->cpf_cnpj)
+            : null;
+
         if ($user->asaas_customer_id) {
+            // Se agora temos CPF, atualiza o cliente no Asaas
+            if ($cleanCpf) {
+                $this->http()->put("/customers/{$user->asaas_customer_id}", [
+                    'name'     => $user->name,
+                    'email'    => $user->email,
+                    'cpfCnpj'  => $cleanCpf,
+                ]);
+            }
             return $user->asaas_customer_id;
         }
 
-        $response = $this->http()->post('/customers', [
+        $payload = [
             'name'  => $user->name,
             'email' => $user->email,
-        ]);
+        ];
+
+        if ($cleanCpf) {
+            $payload['cpfCnpj'] = $cleanCpf;
+        }
+
+        $response = $this->http()->post('/customers', $payload);
 
         if ($response->failed()) {
             Log::error('Asaas: falha ao criar cliente', [
@@ -67,9 +91,9 @@ class AsaasService
      * Cria uma cobrança avulsa (curso ou aula).
      * Retorna o array completo da resposta do Asaas.
      */
-    public function createPayment(User $user, float $amount, string $billingType, string $description): array
+    public function createPayment(User $user, float $amount, string $billingType, string $description, ?string $cpfCnpj = null): array
     {
-        $customerId = $this->getOrCreateCustomer($user);
+        $customerId = $this->getOrCreateCustomer($user, $cpfCnpj);
 
         $payload = [
             'customer'    => $customerId,
@@ -127,9 +151,9 @@ class AsaasService
      * Cria uma assinatura recorrente mensal para uma categoria.
      * Retorna o array completo da resposta do Asaas.
      */
-    public function createSubscription(User $user, Category $category, string $billingType): array
+    public function createSubscription(User $user, Category $category, string $billingType, ?string $cpfCnpj = null): array
     {
-        $customerId = $this->getOrCreateCustomer($user);
+        $customerId = $this->getOrCreateCustomer($user, $cpfCnpj);
 
         $payload = [
             'customer'    => $customerId,

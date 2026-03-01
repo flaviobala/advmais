@@ -30,15 +30,16 @@ class SubscriptionController extends Controller
 
     public function subscribe(Request $request, Category $category)
     {
+        $user = auth()->user();
+
         $request->validate([
             'billing_type' => 'required|in:PIX,CREDIT_CARD,BOLETO',
+            'cpf_cnpj'     => ($user->cpf_cnpj ? 'nullable' : 'required') . '|string|min:11',
         ]);
 
         if (!$category->price) {
             abort(404);
         }
-
-        $user = auth()->user();
 
         if ($user->hasActiveSubscription($category->id)) {
             return redirect()->route('subscription.show', $category)
@@ -46,7 +47,7 @@ class SubscriptionController extends Controller
         }
 
         try {
-            $asaasData = $this->asaas->createSubscription($user, $category, $request->billing_type);
+            $asaasData = $this->asaas->createSubscription($user, $category, $request->billing_type, $request->cpf_cnpj);
 
             Subscription::create([
                 'user_id'               => $user->id,

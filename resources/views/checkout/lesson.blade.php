@@ -18,6 +18,17 @@
             <form action="{{ route('checkout.lesson.process', $lesson) }}" method="POST">
                 @csrf
 
+                @if(!auth()->user()->cpf_cnpj)
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">CPF ou CNPJ</label>
+                        <input type="text" name="cpf_cnpj" value="{{ old('cpf_cnpj') }}"
+                               placeholder="000.000.000-00 ou 00.000.000/0001-00"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               required>
+                        <p class="text-xs text-gray-400 mt-1">Necessário para emissão da cobrança.</p>
+                    </div>
+                @endif
+
                 <p class="text-sm font-medium text-gray-700 mb-3">Forma de pagamento</p>
                 <div class="grid grid-cols-3 gap-3 mb-6">
                     <label class="flex flex-col items-center justify-center border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition">

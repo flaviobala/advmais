@@ -30,15 +30,16 @@ class PaymentController extends Controller
 
     public function processCoursePayment(Request $request, Course $course)
     {
+        $user = auth()->user();
+
         $request->validate([
             'billing_type' => 'required|in:PIX,CREDIT_CARD,BOLETO',
+            'cpf_cnpj'     => ($user->cpf_cnpj ? 'nullable' : 'required') . '|string|min:11',
         ]);
 
         if (!$course->price) {
             abort(404);
         }
-
-        $user = auth()->user();
 
         if ($user->hasAccessToCourse($course->id)) {
             return redirect()->route('courses.show', $course)->with('info', 'Você já tem acesso.');
@@ -49,7 +50,8 @@ class PaymentController extends Controller
                 $user,
                 (float) $course->price,
                 $request->billing_type,
-                "Acesso ao curso: {$course->title}"
+                "Acesso ao curso: {$course->title}",
+                $request->cpf_cnpj
             );
 
             $pixData = [];
@@ -96,15 +98,16 @@ class PaymentController extends Controller
 
     public function processLessonPayment(Request $request, Lesson $lesson)
     {
+        $user = auth()->user();
+
         $request->validate([
             'billing_type' => 'required|in:PIX,CREDIT_CARD,BOLETO',
+            'cpf_cnpj'     => ($user->cpf_cnpj ? 'nullable' : 'required') . '|string|min:11',
         ]);
 
         if (!$lesson->price) {
             abort(404);
         }
-
-        $user = auth()->user();
 
         if ($user->hasAccessToLesson($lesson->id)) {
             return redirect()->route('courses.lesson', [$lesson->course_id, $lesson->id])
@@ -116,7 +119,8 @@ class PaymentController extends Controller
                 $user,
                 (float) $lesson->price,
                 $request->billing_type,
-                "Acesso à aula: {$lesson->title}"
+                "Acesso à aula: {$lesson->title}",
+                $request->cpf_cnpj
             );
 
             $pixData = [];
