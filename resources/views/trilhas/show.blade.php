@@ -50,21 +50,21 @@
                 </span>
             </div>
 
-            @if($category->price && !auth()->user()->hasActiveSubscription($category->id))
+            @if(!auth()->user()->hasActiveSubscription())
                 <div class="mt-auto flex items-center justify-between bg-blue-50 rounded-lg p-3">
                     <div>
-                        <p class="text-xs text-gray-500">Acesso a todos os cursos por</p>
-                        <p class="text-xl font-bold text-green-600">R$ {{ number_format($category->price, 2, ',', '.') }}<span class="text-xs font-normal text-gray-400">/mês</span></p>
+                        <p class="text-xs text-gray-500">Acesso completo à plataforma por</p>
+                        <p class="text-xl font-bold text-green-600">R$ {{ number_format(config('services.platform.annual_price'), 2, ',', '.') }}<span class="text-xs font-normal text-gray-400">/ano</span></p>
                     </div>
-                    <a href="{{ route('subscription.show', $category) }}"
+                    <a href="{{ route('subscription.show') }}"
                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg transition text-sm">
                         Assinar
                     </a>
                 </div>
-            @elseif($category->price && auth()->user()->hasActiveSubscription($category->id))
+            @else
                 <div class="mt-auto bg-green-50 rounded-lg p-3">
-                    <p class="text-sm text-green-700 font-medium">✓ Assinatura ativa</p>
-                    <a href="{{ route('subscription.show', $category) }}" class="text-xs text-green-600 hover:underline">Gerenciar assinatura</a>
+                    <p class="text-sm text-green-700 font-medium">✓ Acesso completo ativo</p>
+                    <a href="{{ route('subscription.show') }}" class="text-xs text-green-600 hover:underline">Gerenciar assinatura</a>
                 </div>
             @endif
         </div>

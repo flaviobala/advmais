@@ -98,8 +98,8 @@
             </div>
 
             <div class="border-t border-gray-200 pt-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Assinatura Mensal (Asaas)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Assinatura (Asaas)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Valor Mensal (R$)</label>
                         <input type="number"
@@ -110,7 +110,19 @@
                                min="0"
                                placeholder="Ex: 97.00"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="mt-1 text-xs text-gray-500">Deixe em branco para não oferecer assinatura nesta trilha.</p>
+                        <p class="mt-1 text-xs text-gray-500">Deixe em branco para não oferecer assinatura.</p>
+                    </div>
+                    <div>
+                        <label for="price_annual" class="block text-sm font-medium text-gray-700 mb-1">Valor Anual (R$)</label>
+                        <input type="number"
+                               id="price_annual"
+                               name="price_annual"
+                               value="{{ old('price_annual', $category->price_annual) }}"
+                               step="0.01"
+                               min="0"
+                               placeholder="Ex: 970.00"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="mt-1 text-xs text-gray-500">Deixe em branco para não oferecer plano anual.</p>
                     </div>
                     <div>
                         <label for="asaas_plan_id" class="block text-sm font-medium text-gray-700 mb-1">ID do Plano no Asaas</label>

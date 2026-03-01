@@ -148,29 +148,32 @@ class AsaasService
     // ─── Assinaturas ──────────────────────────────────────────────────────────
 
     /**
-     * Cria uma assinatura recorrente mensal para uma categoria.
+     * Cria uma assinatura anual de plataforma no Asaas.
      * Retorna o array completo da resposta do Asaas.
      */
-    public function createSubscription(User $user, Category $category, string $billingType, ?string $cpfCnpj = null): array
+    public function createSubscription(User $user, ?Category $category, string $billingType, ?string $cpfCnpj = null, string $cycle = 'YEARLY', float $amount = 0): array
     {
         $customerId = $this->getOrCreateCustomer($user, $cpfCnpj);
+
+        $description = $category
+            ? "Plano Anual - {$category->name}"
+            : 'Plano Anual - AdvMais';
 
         $payload = [
             'customer'    => $customerId,
             'billingType' => $billingType,
-            'value'       => $category->price,
+            'value'       => $amount,
             'nextDueDate' => now()->addDays(1)->format('Y-m-d'),
-            'cycle'       => 'MONTHLY',
-            'description' => "Assinatura mensal - {$category->name}",
+            'cycle'       => $cycle,
+            'description' => $description,
         ];
 
         $response = $this->http()->post('/subscriptions', $payload);
 
         if ($response->failed()) {
             Log::error('Asaas: falha ao criar assinatura', [
-                'user_id'     => $user->id,
-                'category_id' => $category->id,
-                'response'    => $response->json(),
+                'user_id'  => $user->id,
+                'response' => $response->json(),
             ]);
             throw new \Exception('Falha ao criar assinatura no Asaas: ' . $response->body());
         }

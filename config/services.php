@@ -44,4 +44,8 @@ return [
             : 'https://sandbox.asaas.com/api/v3',
     ],
 
+    'platform' => [
+        'annual_price' => env('PLATFORM_ANNUAL_PRICE', 497.00),
+    ],
+
 ];

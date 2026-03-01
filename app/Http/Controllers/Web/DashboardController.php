@@ -14,9 +14,9 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         // Trilhas ativas com contagem de cursos aprovados
-        $isAdmin = in_array($user->role, ['admin', 'professor']);
-        $userCategoryIds = $isAdmin ? [] : $user->categories()->pluck('category_id')->toArray();
-        $userSubscriptionCategoryIds = $isAdmin ? [] : $user->subscriptions()->where('status', 'active')->pluck('category_id')->toArray();
+        $isAdmin            = in_array($user->role, ['admin', 'professor']);
+        $userCategoryIds    = $isAdmin ? [] : $user->categories()->pluck('category_id')->toArray();
+        $hasPlatformAccess  = $isAdmin || $user->hasActiveSubscription();
 
         $categories = Category::active()
             ->withCount(['courses' => function ($q) {
@@ -25,10 +25,9 @@ class DashboardController extends Controller
             ->orderBy('order')
             ->orderBy('name')
             ->get()
-            ->map(function ($category) use ($isAdmin, $userCategoryIds, $userSubscriptionCategoryIds) {
-                $category->is_locked = !$isAdmin
-                    && !in_array($category->id, $userCategoryIds)
-                    && !in_array($category->id, $userSubscriptionCategoryIds);
+            ->map(function ($category) use ($isAdmin, $userCategoryIds, $hasPlatformAccess) {
+                $category->is_locked = !$hasPlatformAccess
+                    && !in_array($category->id, $userCategoryIds);
                 return $category;
             })
             ->sortBy('is_locked')

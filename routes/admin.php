@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\MaterialController;
 use App\Http\Controllers\Admin\UserCategoryController;
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\UserCourseController;
+use App\Http\Controllers\Admin\VoucherController;
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
@@ -65,6 +66,10 @@ Route::prefix('admin')
             Route::post('users/{user}/categories', [UserCategoryController::class, 'sync'])->name('users.categories.sync');
             Route::get('users/{user}/lessons', [UserLessonController::class, 'index'])->name('users.lessons');
             Route::post('users/{user}/lessons', [UserLessonController::class, 'sync'])->name('users.lessons.sync');
+
+            // Vouchers / Cupons
+            Route::resource('vouchers', VoucherController::class)->only(['index', 'store', 'destroy']);
+            Route::patch('vouchers/{voucher}/toggle', [VoucherController::class, 'toggle'])->name('vouchers.toggle');
 
             // ADV+CONECTA (Sobre)
             Route::get('about', [AboutController::class, 'index'])->name('about.index');

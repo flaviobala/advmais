@@ -55,11 +55,16 @@ class User extends Authenticatable
         return $this->hasMany(Subscription::class);
     }
 
-    public function hasActiveSubscription(int $categoryId): bool
+    /**
+     * Verifica se o usuário tem assinatura anual da plataforma ativa e não expirada.
+     */
+    public function hasActiveSubscription(): bool
     {
         return $this->subscriptions()
-            ->where('category_id', $categoryId)
             ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
             ->exists();
     }
 
@@ -118,7 +123,7 @@ class User extends Authenticatable
             return true;
         }
 
-        if ($course->category_id && $this->hasActiveSubscription($course->category_id)) {
+        if ($this->hasActiveSubscription()) {
             return true;
         }
 

@@ -19,12 +19,14 @@ class Category extends Model
         'order',
         'is_active',
         'price',
+        'price_annual',
         'asaas_plan_id',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'price'     => 'decimal:2',
+        'is_active'    => 'boolean',
+        'price'        => 'decimal:2',
+        'price_annual' => 'decimal:2',
     ];
 
     public function courses(): HasMany

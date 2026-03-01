@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Lesson;
 use App\Models\Payment;
 use App\Models\Subscription;
@@ -22,16 +21,16 @@ class WebhookController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $event   = $request->input('event');
-        $payment = $request->input('payment');
+        $event        = $request->input('event');
+        $paymentData  = $request->input('payment');
         $subscription = $request->input('subscription');
 
         Log::info('Asaas Webhook recebido', ['event' => $event]);
 
         match ($event) {
-            'PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED' => $this->handlePaymentConfirmed($payment),
-            'PAYMENT_OVERDUE'                        => $this->handlePaymentOverdue($payment),
-            'PAYMENT_DELETED'                        => $this->handlePaymentDeleted($payment),
+            'PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED' => $this->handlePaymentConfirmed($paymentData),
+            'PAYMENT_OVERDUE'                        => $this->handlePaymentOverdue($paymentData),
+            'PAYMENT_DELETED'                        => $this->handlePaymentDeleted($paymentData),
             'SUBSCRIPTION_INACTIVATED',
             'SUBSCRIPTION_CANCELLED',
             'SUBSCRIPTION_DELETED'                   => $this->handleSubscriptionCancelled($subscription),
@@ -58,16 +57,20 @@ class WebhookController extends Controller
                 return;
             }
 
+            // Pagamento de curso avulso
             if ($payment->payable_type === \App\Models\Course::class) {
                 $user->courses()->syncWithoutDetaching([$payable->id]);
+
+            // Pagamento de aula avulsa
             } elseif ($payment->payable_type === Lesson::class) {
                 $user->accessibleLessons()->syncWithoutDetaching([$payable->id]);
-            } elseif ($payment->payable_type === Category::class) {
-                // Pagamento da primeira mensalidade: ativa a assinatura
-                Subscription::where('user_id', $user->id)
-                    ->where('category_id', $payable->id)
-                    ->whereIn('status', ['pending', 'overdue'])
-                    ->update(['status' => 'active']);
+
+            // Pagamento do plano anual (payable = Subscription)
+            } elseif ($payment->payable_type === Subscription::class) {
+                $payable->update([
+                    'status'     => 'active',
+                    'expires_at' => now()->addYear(),
+                ]);
             }
 
             Log::info('Asaas Webhook: acesso liberado', [
@@ -79,12 +82,15 @@ class WebhookController extends Controller
             return;
         }
 
-        // Pagamento de renovação de assinatura (não tem registro em payments)
+        // Renovação anual (não tem Payment no banco — busca pela subscription)
         if (!empty($paymentData['subscription'])) {
             $subscription = Subscription::where('asaas_subscription_id', $paymentData['subscription'])->first();
 
             if ($subscription) {
-                $subscription->update(['status' => 'active']);
+                $subscription->update([
+                    'status'     => 'active',
+                    'expires_at' => now()->addYear(),
+                ]);
 
                 Log::info('Asaas Webhook: renovação de assinatura confirmada', [
                     'subscription_id' => $subscription->id,
@@ -100,6 +106,11 @@ class WebhookController extends Controller
 
         if ($payment) {
             $payment->update(['status' => 'overdue']);
+
+            // Se for pagamento de assinatura, marca a assinatura como overdue
+            if ($payment->payable_type === Subscription::class && $payment->payable) {
+                $payment->payable->update(['status' => 'overdue']);
+            }
         }
     }
 
@@ -133,7 +144,6 @@ class WebhookController extends Controller
         Log::info('Asaas Webhook: assinatura cancelada', [
             'subscription_id' => $subscription->id,
             'user_id'         => $subscription->user_id,
-            'category_id'     => $subscription->category_id,
         ]);
     }
 }

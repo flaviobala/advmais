@@ -56,9 +56,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/aula/{lesson}', [PaymentController::class, 'processLessonPayment'])->name('checkout.lesson.process');
     Route::get('/checkout/sucesso/{payment}', [PaymentController::class, 'success'])->name('checkout.success');
 
-    // Assinaturas por trilha
-    Route::get('/assinar/{category}', [SubscriptionController::class, 'show'])->name('subscription.show');
-    Route::post('/assinar/{category}', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
+    // Plano Anual da Plataforma
+    Route::get('/assinar', [SubscriptionController::class, 'show'])->name('subscription.show');
+    Route::post('/assinar', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
+    Route::post('/assinar/validar-voucher', [SubscriptionController::class, 'validateVoucher'])->name('subscription.validate-voucher');
     Route::post('/cancelar-assinatura/{subscription}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
 
     // Logout
