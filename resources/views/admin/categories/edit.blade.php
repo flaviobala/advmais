@@ -97,6 +97,33 @@
                 </label>
             </div>
 
+            <div class="border-t border-gray-200 pt-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Assinatura Mensal (Asaas)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Valor Mensal (R$)</label>
+                        <input type="number"
+                               id="price"
+                               name="price"
+                               value="{{ old('price', $category->price) }}"
+                               step="0.01"
+                               min="0"
+                               placeholder="Ex: 97.00"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="mt-1 text-xs text-gray-500">Deixe em branco para não oferecer assinatura nesta trilha.</p>
+                    </div>
+                    <div>
+                        <label for="asaas_plan_id" class="block text-sm font-medium text-gray-700 mb-1">ID do Plano no Asaas</label>
+                        <input type="text"
+                               id="asaas_plan_id"
+                               name="asaas_plan_id"
+                               value="{{ old('asaas_plan_id', $category->asaas_plan_id) }}"
+                               placeholder="Opcional - para referência"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
             <div class="flex justify-end gap-4 pt-4 border-t border-gray-200">
                 <a href="{{ route('admin.categories.index') }}"
                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">

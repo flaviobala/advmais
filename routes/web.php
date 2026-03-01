@@ -6,6 +6,8 @@ use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\CourseController;
 use App\Http\Controllers\Web\TrilhaController;
 use App\Http\Controllers\Web\AboutController;
+use App\Http\Controllers\Web\PaymentController;
+use App\Http\Controllers\Web\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +48,18 @@ Route::middleware('auth')->group(function () {
     // Cursos
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
     Route::get('/courses/{courseId}/lessons/{lessonId}', [CourseController::class, 'lesson'])->name('courses.lesson');
+
+    // Checkout avulso (cursos e aulas)
+    Route::get('/checkout/curso/{course}', [PaymentController::class, 'showCourseCheckout'])->name('checkout.course');
+    Route::post('/checkout/curso/{course}', [PaymentController::class, 'processCoursePayment'])->name('checkout.course.process');
+    Route::get('/checkout/aula/{lesson}', [PaymentController::class, 'showLessonCheckout'])->name('checkout.lesson');
+    Route::post('/checkout/aula/{lesson}', [PaymentController::class, 'processLessonPayment'])->name('checkout.lesson.process');
+    Route::get('/checkout/sucesso/{payment}', [PaymentController::class, 'success'])->name('checkout.success');
+
+    // Assinaturas por trilha
+    Route::get('/assinar/{category}', [SubscriptionController::class, 'show'])->name('subscription.show');
+    Route::post('/assinar/{category}', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
+    Route::post('/cancelar-assinatura/{subscription}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

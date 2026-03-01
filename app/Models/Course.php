@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Payment;
 
 class Course extends Model
 {
@@ -23,11 +24,13 @@ class Course extends Model
         'category_id',
         'is_approved',
         'created_by',
+        'price',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'  => 'boolean',
         'is_approved' => 'boolean',
+        'price'      => 'decimal:2',
     ];
 
     public function creator(): BelongsTo
@@ -62,6 +65,11 @@ class Course extends Model
     public function materials(): MorphMany
     {
         return $this->morphMany(Material::class, 'materialable')->orderBy('order');
+    }
+
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
     }
 
     /**

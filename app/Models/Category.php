@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Subscription;
 
 class Category extends Model
 {
@@ -17,15 +18,23 @@ class Category extends Model
         'cover_image',
         'order',
         'is_active',
+        'price',
+        'asaas_plan_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'price'     => 'decimal:2',
     ];
 
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class)->orderBy('title');
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
     }
 
     public function scopeActive($query)

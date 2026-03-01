@@ -2,8 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;       // Import do Controller de Auth (Novo)
-use App\Http\Controllers\Api\CourseController; // Import do Controller de Cursos (Existente)
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\WebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,9 @@ use App\Http\Controllers\Api\CourseController; // Import do Controller de Cursos
 
 // Login (Cria a sessão/cookie)
 Route::post('/login', [AuthController::class, 'login']);
+
+// Webhook Asaas (sem autenticação - validado por token interno)
+Route::post('/webhook/asaas', [WebhookController::class, 'handle'])->name('webhook.asaas');
 
 // ========================================================================
 // 2. ROTAS PROTEGIDAS (Exigem login via Sanctum)

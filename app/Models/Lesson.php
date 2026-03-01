@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Payment;
 
 class Lesson extends Model
 {
@@ -24,10 +25,12 @@ class Lesson extends Model
         'duration_seconds',
         'attachment',
         'is_active',
+        'price',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'price'     => 'decimal:2',
     ];
 
     /**
@@ -79,5 +82,10 @@ class Lesson extends Model
     public function materials(): MorphMany
     {
         return $this->morphMany(Material::class, 'materialable')->orderBy('order');
+    }
+
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
     }
 }

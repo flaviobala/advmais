@@ -4,17 +4,20 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Lesson;
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Payment;
+use App\Models\Subscription;
 
 class User extends Authenticatable
 {
     use Notifiable, SoftDeletes;
 
-    protected $fillable = ['name', 'email', 'password', 'role', 'is_active'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'is_active', 'asaas_customer_id'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -42,8 +45,23 @@ class User extends Authenticatable
         return in_array($this->role, ['admin', 'professor']);
     }
 
-    // Relacionamento: Usuário pertence a vários grupos
-    // groups removed
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function hasActiveSubscription(int $categoryId): bool
+    {
+        return $this->subscriptions()
+            ->where('category_id', $categoryId)
+            ->where('status', 'active')
+            ->exists();
+    }
 
     /**
      * Relacionamento: Categorias que o usuário tem acesso.
@@ -97,6 +115,10 @@ class User extends Authenticatable
         }
 
         if ($course->category_id && $this->categories()->where('category_id', $course->category_id)->exists()) {
+            return true;
+        }
+
+        if ($course->category_id && $this->hasActiveSubscription($course->category_id)) {
             return true;
         }
 

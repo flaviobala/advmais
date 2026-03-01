@@ -31,10 +31,12 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'cover_image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
-            'order' => 'nullable|integer|min:0',
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string|max:500',
+            'cover_image'   => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
+            'order'         => 'nullable|integer|min:0',
+            'price'         => 'nullable|numeric|min:0',
+            'asaas_plan_id' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('cover_image')) {
@@ -67,10 +69,12 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'cover_image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
-            'order' => 'nullable|integer|min:0',
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string|max:500',
+            'cover_image'   => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
+            'order'         => 'nullable|integer|min:0',
+            'price'         => 'nullable|numeric|min:0',
+            'asaas_plan_id' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('cover_image')) {
