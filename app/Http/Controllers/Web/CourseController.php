@@ -16,14 +16,6 @@ class CourseController extends Controller
     {
         $user = auth()->user();
 
-        $hasFullAccess = $user->hasAccessToCourse($id);
-        $hasPartialAccess = $user->hasPartialAccessToCourse($id);
-
-        if (!$hasFullAccess && !$hasPartialAccess) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Você não tem acesso a este curso. Entre em contato com o administrador.');
-        }
-
         $course = Course::where('is_approved', true)
         ->with([
             'modules' => fn($q) => $q->where('is_active', true)->orderBy('order'),
@@ -33,6 +25,15 @@ class CourseController extends Controller
             'materials' => fn($q) => $q->orderBy('order'),
         ])
         ->findOrFail($id);
+
+        $hasFullAccess = $user->hasAccessToCourse($id);
+        $hasPartialAccess = $user->hasPartialAccessToCourse($id);
+
+        // Sem nenhum acesso: só mostra a página se o curso tiver preço (para compra)
+        if (!$hasFullAccess && !$hasPartialAccess && !$course->price) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Você não tem acesso a este curso. Entre em contato com o administrador.');
+        }
 
         $accessibleLessonIds = $user->getAccessibleLessonIdsForCourse($id);
 
