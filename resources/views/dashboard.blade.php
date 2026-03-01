@@ -60,48 +60,30 @@
                 </a>
 
                 @foreach($categories as $category)
-                    @if($category->is_locked)
-                        <div class="group block bg-white rounded-lg shadow overflow-hidden opacity-90">
-                            <div class="aspect-video bg-gradient-to-br from-blue-400 to-blue-600 relative overflow-hidden">
-                                @if($category->cover_image)
-                                    <img src="{{ Storage::url($category->cover_image) }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                        </svg>
-                                    </div>
-                                @endif
+                    <a href="{{ route('trilhas.show', $category->id) }}" class="group block bg-white rounded-lg shadow hover:shadow-xl transition-all duration-300 overflow-hidden transform {{ $category->is_locked ? 'opacity-90' : 'hover:-translate-y-1' }}">
+                        <div class="aspect-video bg-gradient-to-br from-blue-400 to-blue-600 relative overflow-hidden">
+                            @if($category->cover_image)
+                                <img src="{{ Storage::url($category->cover_image) }}" alt="{{ $category->name }}" class="w-full h-full object-cover {{ $category->is_locked ? '' : 'group-hover:scale-105 transition-transform duration-300' }}">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                    </svg>
+                                </div>
+                            @endif
+                            @if($category->is_locked)
                                 <div class="absolute bottom-2 right-2 bg-black bg-opacity-70 rounded-full p-1.5">
                                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
                                 </div>
-                            </div>
-                            <div class="p-3">
-                                <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-tight">{{ $category->name }}</h3>
-                                <p class="text-xs text-gray-400 mt-1">{{ $category->courses_count }} {{ $category->courses_count == 1 ? 'curso' : 'cursos' }}</p>
-                            </div>
+                            @endif
                         </div>
-                    @else
-                        <a href="{{ route('trilhas.show', $category->id) }}" class="group block bg-white rounded-lg shadow hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
-                            <div class="aspect-video bg-gradient-to-br from-blue-400 to-blue-600 relative overflow-hidden">
-                                @if($category->cover_image)
-                                    <img src="{{ Storage::url($category->cover_image) }}" alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                        </svg>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="p-3">
-                                <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-tight">{{ $category->name }}</h3>
-                                <p class="text-xs text-gray-400 mt-1">{{ $category->courses_count }} {{ $category->courses_count == 1 ? 'curso' : 'cursos' }}</p>
-                            </div>
-                        </a>
-                    @endif
+                        <div class="p-3">
+                            <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-tight">{{ $category->name }}</h3>
+                            <p class="text-xs text-gray-400 mt-1">{{ $category->courses_count }} {{ $category->courses_count == 1 ? 'curso' : 'cursos' }}</p>
+                        </div>
+                    </a>
                 @endforeach
             </div>
         @endif
