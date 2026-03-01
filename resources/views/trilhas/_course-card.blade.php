@@ -52,6 +52,11 @@
                     Acessar
                 @endif
             </a>
+        @elseif($course->price)
+            <p class="text-xs text-gray-400 mt-1 mb-2">{{ $course->lessons_count }} aulas</p>
+            <a href="{{ route('checkout.course', $course->id) }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors mt-3">
+                Comprar — R$ {{ number_format($course->price, 2, ',', '.') }}
+            </a>
         @else
             <span class="block w-full text-center bg-gray-300 text-gray-500 text-xs font-semibold py-2 rounded-lg cursor-not-allowed mt-3">
                 Sem Acesso
