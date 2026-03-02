@@ -3,29 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ADV+ CONECTA - Login</title>
+    <title>ADV+ CONECTA - Nova Senha</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
 
     <div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
 
-        <!-- Container Principal -->
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
 
-            <!-- Card do Formulário -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl sm:rounded-xl overflow-hidden">
 
                 <!-- Logo -->
-                <div class="px-8 py-10 text-center relative">
-                    <!-- Botão Voltar -->
-                    <a href="{{ url('/') }}" class="absolute left-4 top-4 flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
-                        <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span class="text-sm">Voltar</span>
-                    </a>
-
+                <div class="px-8 py-10 text-center">
                     <div class="flex justify-center">
                         <img src="/Logo adv mais.png" alt="ADV+ CONECTA" class="h-32 w-auto">
                     </div>
@@ -34,16 +24,17 @@
                 <!-- Formulário -->
                 <div class="px-8 py-8 bg-slate-900/50 border-t border-slate-700/50">
 
-                    @if (session('success'))
-                        <div class="mb-5 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg px-4 py-3 text-sm text-center">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+                    <h2 class="text-center text-lg font-semibold text-white mb-1">Criar nova senha</h2>
+                    <p class="text-center text-sm text-gray-400 mb-6">
+                        Escolha uma nova senha para sua conta.
+                    </p>
 
-                    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('password.update') }}" class="space-y-5">
                         @csrf
 
-                        <!-- Email -->
+                        <input type="hidden" name="token" value="{{ $token }}">
+
+                        <!-- E-mail -->
                         <div>
                             <label for="email" class="block text-sm font-semibold text-gray-200 mb-1.5">
                                 E-mail
@@ -54,96 +45,79 @@
                                 id="email"
                                 required
                                 autocomplete="email"
+                                value="{{ old('email', $email) }}"
+                                placeholder="seu@email.com"
                                 class="appearance-none block w-full px-4 py-2.5 border border-slate-600 rounded-lg
                                        placeholder-gray-500 text-white bg-slate-800/50
                                        focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent
-                                       transition-all sm:text-sm"
-                                placeholder="seu@email.com"
-                                value="{{ old('email') }}"
-                            >
+                                       transition-all sm:text-sm">
                             @error('email')
                                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Senha -->
+                        <!-- Nova Senha -->
                         <div>
                             <label for="password" class="block text-sm font-semibold text-gray-200 mb-1.5">
-                                Senha
+                                Nova senha
                             </label>
                             <input
                                 type="password"
                                 name="password"
                                 id="password"
                                 required
-                                autocomplete="current-password"
+                                placeholder="Mínimo 6 caracteres"
                                 class="appearance-none block w-full px-4 py-2.5 border border-slate-600 rounded-lg
                                        placeholder-gray-500 text-white bg-slate-800/50
                                        focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent
-                                       transition-all sm:text-sm"
-                                placeholder="••••••••"
-                            >
+                                       transition-all sm:text-sm">
                             @error('password')
                                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Lembrar-me -->
-                        <div class="flex items-center justify-between pt-1">
-                            <div class="flex items-center">
-                                <input
-                                    id="remember"
-                                    name="remember"
-                                    type="checkbox"
-                                    class="h-4 w-4 text-slate-600 focus:ring-slate-500 border-slate-600 rounded bg-slate-800"
-                                >
-                                <label for="remember" class="ml-2 block text-sm text-gray-300">
-                                    Lembrar-me
-                                </label>
-                            </div>
-
-                            <div class="text-sm">
-                                <a href="{{ route('password.request') }}" class="font-medium text-gray-300 hover:text-white transition-colors">
-                                    Esqueceu a senha?
-                                </a>
-                            </div>
+                        <!-- Confirmar Senha -->
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-semibold text-gray-200 mb-1.5">
+                                Confirmar nova senha
+                            </label>
+                            <input
+                                type="password"
+                                name="password_confirmation"
+                                id="password_confirmation"
+                                required
+                                placeholder="Repita a senha"
+                                class="appearance-none block w-full px-4 py-2.5 border border-slate-600 rounded-lg
+                                       placeholder-gray-500 text-white bg-slate-800/50
+                                       focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent
+                                       transition-all sm:text-sm">
                         </div>
 
-                        <!-- Botão de Login -->
                         <div class="pt-2">
-                            <button
-                                type="submit"
+                            <button type="submit"
                                 class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
                                        text-sm font-semibold text-white
                                        bg-slate-700 hover:bg-slate-600
                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500
-                                       shadow-lg hover:shadow-xl
-                                       transition-all duration-200"
-                            >
-                                Acessar Plataforma
+                                       shadow-lg hover:shadow-xl transition-all duration-200">
+                                Salvar nova senha
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Footer Interno -->
                 <div class="px-8 py-4 bg-slate-950/50 border-t border-slate-700/50">
-                    <p class="text-xs text-center text-gray-400">
-                        Acesso seguro e protegido
-                    </p>
+                    <p class="text-xs text-center text-gray-400">Acesso seguro e protegido</p>
                 </div>
             </div>
 
-            <!-- Copyright -->
             <p class="mt-6 text-center text-xs text-gray-400">
                 &copy; {{ date('Y') }} ADV+ CONECTA. Todos os direitos reservados.
             </p>
             <p class="mt-2 text-center text-xs text-gray-600">
                 Desenvolvido por
-                <a href="https://wa.me/5582999730532"
-                   target="_blank"
-                   rel="noopener"
-                   class="text-gray-500 hover:text-yellow-500 transition-colors duration-200 no-underline">
+                <a href="https://wa.me/5582999730532" target="_blank" rel="noopener"
+                   class="text-gray-500 hover:text-yellow-500 transition-colors duration-200">
                     Flávio Henrique
                 </a>
             </p>

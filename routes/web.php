@@ -8,12 +8,25 @@ use App\Http\Controllers\Web\TrilhaController;
 use App\Http\Controllers\Web\AboutController;
 use App\Http\Controllers\Web\PaymentController;
 use App\Http\Controllers\Web\SubscriptionController;
+use App\Http\Controllers\Web\GuestCheckoutController;
+use App\Http\Controllers\Web\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// ─── RECUPERAÇÃO DE SENHA (público) ──────────────────────────────────────────
+Route::get('/esqueci-senha', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+Route::post('/esqueci-senha', [PasswordResetController::class, 'sendResetLink'])->name('password.send');
+Route::get('/redefinir-senha/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/redefinir-senha', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+
+// ─── CHECKOUT PÚBLICO (sem login) ────────────────────────────────────────────
+Route::get('/comecar', [GuestCheckoutController::class, 'show'])->name('guest.checkout.show');
+Route::post('/comecar', [GuestCheckoutController::class, 'checkout'])->name('guest.checkout');
+Route::post('/comecar/validar-voucher', [GuestCheckoutController::class, 'validateVoucher'])->name('guest.validate-voucher');
 
 // Página inicial institucional
 Route::get('/', function () {
