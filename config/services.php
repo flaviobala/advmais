@@ -45,7 +45,7 @@ return [
     ],
 
     'platform' => [
-        'annual_price' => env('PLATFORM_ANNUAL_PRICE', 497.00),
+        'annual_price' => env('PLATFORM_ANNUAL_PRICE'),
     ],
 
 ];

@@ -54,7 +54,9 @@
                 <div class="mt-auto flex items-center justify-between bg-blue-50 rounded-lg p-3">
                     <div>
                         <p class="text-xs text-gray-500">Acesso completo à plataforma por</p>
-                        <p class="text-xl font-bold text-green-600">R$ {{ number_format(config('services.platform.annual_price'), 2, ',', '.') }}<span class="text-xs font-normal text-gray-400">/ano</span></p>
+                        @if(config('services.platform.annual_price'))
+                        <p class="text-xl font-bold text-green-600">R$ {{ number_format((float) config('services.platform.annual_price'), 2, ',', '.') }}<span class="text-xs font-normal text-gray-400">/ano</span></p>
+                        @endif
                     </div>
                     <a href="{{ route('subscription.show') }}"
                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg transition text-sm">
