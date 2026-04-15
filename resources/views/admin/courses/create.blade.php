@@ -194,7 +194,7 @@
                 ctx.drawImage(img, x, y, w, h);
 
                 canvas.toBlob(function(blob) {
-                    const resizedFile = new File([blob], 'cover.png', { type: 'image/png' });
+                    const resizedFile = new File([blob], 'cover.jpg', { type: 'image/jpeg' });
                     const dt = new DataTransfer();
                     dt.items.add(resizedFile);
                     coverInput.files = dt.files;
@@ -202,7 +202,7 @@
                     previewImg.src = URL.createObjectURL(blob);
                     placeholder.classList.add('hidden');
                     preview.classList.remove('hidden');
-                }, 'image/png', 0.9);
+                }, 'image/jpeg', 0.85);
             };
             img.src = URL.createObjectURL(file);
         });
@@ -244,7 +244,7 @@
                 ctx.drawImage(img, x, y, w, h);
 
                 canvas.toBlob(function(blob) {
-                    const resizedFile = new File([blob], 'thumbnail.png', { type: 'image/png' });
+                    const resizedFile = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
                     const dt = new DataTransfer();
                     dt.items.add(resizedFile);
                     thumbInput.files = dt.files;
@@ -252,7 +252,7 @@
                     thumbPreviewImg.src = URL.createObjectURL(blob);
                     thumbPlaceholder.classList.add('hidden');
                     thumbPreview.classList.remove('hidden');
-                }, 'image/png', 0.9);
+                }, 'image/jpeg', 0.85);
             };
             img.src = URL.createObjectURL(file);
         });

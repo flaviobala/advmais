@@ -110,6 +110,12 @@ class User extends Authenticatable
             return true;
         }
 
+        // Membro tem acesso a todos os cursos ativos
+        if ($this->role === 'membro') {
+            $course = Course::find($courseId);
+            return $course && $course->is_active;
+        }
+
         $course = Course::find($courseId);
         if (!$course || !$course->is_active) {
             return false;

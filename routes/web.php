@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
     // Cursos
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
     Route::get('/courses/{courseId}/lessons/{lessonId}', [CourseController::class, 'lesson'])->name('courses.lesson');
+    Route::post('/courses/{courseId}/lessons/{lessonId}/progress', [CourseController::class, 'updateProgress'])->name('courses.lesson.progress');
 
     // Checkout avulso (cursos e aulas)
     Route::get('/checkout/curso/{course}', [PaymentController::class, 'showCourseCheckout'])->name('checkout.course');

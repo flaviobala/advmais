@@ -16,7 +16,7 @@ class DashboardController extends Controller
         // Trilhas ativas com contagem de cursos aprovados
         $isAdmin            = in_array($user->role, ['admin', 'professor']);
         $userCategoryIds    = $isAdmin ? [] : $user->categories()->pluck('category_id')->toArray();
-        $hasPlatformAccess  = $isAdmin || $user->hasActiveSubscription();
+        $hasPlatformAccess  = $isAdmin || $user->role === 'membro' || $user->hasActiveSubscription();
 
         $categories = Category::active()
             ->withCount(['courses' => function ($q) {

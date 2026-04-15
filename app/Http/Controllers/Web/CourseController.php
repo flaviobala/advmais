@@ -56,6 +56,38 @@ class CourseController extends Controller
     }
 
     /**
+     * Atualiza o progresso de uma aula via AJAX.
+     */
+    public function updateProgress(Request $request, $courseId, $lessonId)
+    {
+        $user = auth()->user();
+
+        if (!$user->hasAccessToLesson($lessonId)) {
+            return response()->json(['error' => 'Sem acesso'], 403);
+        }
+
+        $percentage = min(100, max(0, (int) $request->input('percentage', 0)));
+        $isCompleted = $percentage >= 90;
+
+        $existing = $user->lessons()->where('lesson_id', $lessonId)->first();
+        $currentPercentage = $existing ? $existing->pivot->progress_percentage : 0;
+
+        if ($percentage <= $currentPercentage && !$isCompleted) {
+            return response()->json(['ok' => true]);
+        }
+
+        $user->lessons()->syncWithoutDetaching([
+            $lessonId => array_filter([
+                'progress_percentage' => $percentage,
+                'is_completed'        => $isCompleted,
+                'completed_at'        => $isCompleted && !($existing && $existing->pivot->is_completed) ? now() : ($existing ? $existing->pivot->completed_at : null),
+            ], fn($v) => $v !== null),
+        ]);
+
+        return response()->json(['ok' => true, 'percentage' => $percentage, 'completed' => $isCompleted]);
+    }
+
+    /**
      * Exibe uma aula específica com o player de vídeo.
      */
     public function lesson($courseId, $lessonId)
@@ -70,7 +102,7 @@ class CourseController extends Controller
         $course = Course::findOrFail($courseId);
         $lesson = Lesson::where('course_id', $courseId)
             ->where('id', $lessonId)
-            ->with('materials')
+            ->with(['materials', 'attachments'])
             ->firstOrFail();
 
         return view('courses.lesson', compact('course', 'lesson'));

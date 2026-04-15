@@ -68,7 +68,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $data = $request->validate([
+$data = $request->validate([
             'name'          => 'required|string|max:255',
             'description'   => 'nullable|string|max:500',
             'cover_image'   => 'nullable|image|mimes:png,jpg,jpeg,webp|max:4096',
