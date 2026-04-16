@@ -646,7 +646,7 @@
         </p>
         <p class="text-xs mt-4" style="color:#2a4570;">
             Desenvolvido por
-            <a href="https://wa.me/5582999730532"
+            <a href="https://wa.me/5582993678371"
                target="_blank"
                rel="noopener"
                style="color:#3a5a80;text-decoration:none;transition:color 0.2s;"

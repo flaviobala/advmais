@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMemberMail;
 use App\Models\Lesson;
+use App\Models\MemberOnboarding;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Services\AsaasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class WebhookController extends Controller
 {
@@ -67,10 +70,17 @@ class WebhookController extends Controller
 
             // Pagamento do plano anual (payable = Subscription)
             } elseif ($payment->payable_type === Subscription::class) {
+                $isNewSubscription = $payable->status !== 'active';
+
                 $payable->update([
                     'status'     => 'active',
                     'expires_at' => now()->addYear(),
                 ]);
+
+                // Dispara onboarding apenas na primeira ativação
+                if ($isNewSubscription) {
+                    $this->triggerMemberOnboarding($user);
+                }
             }
 
             Log::info('Asaas Webhook: acesso liberado', [
@@ -97,6 +107,27 @@ class WebhookController extends Controller
                     'user_id'         => $subscription->user_id,
                 ]);
             }
+        }
+    }
+
+    private function triggerMemberOnboarding(\App\Models\User $user): void
+    {
+        try {
+            $onboarding = MemberOnboarding::firstOrCreate(
+                ['user_id' => $user->id],
+                ['token' => \Illuminate\Support\Str::random(64), 'status' => 'pending']
+            );
+
+            Mail::to($user->email)->send(new WelcomeMemberMail($user, $onboarding));
+
+            $onboarding->update(['welcome_sent_at' => now()]);
+
+            Log::info('Onboarding: email de boas-vindas enviado', ['user_id' => $user->id]);
+        } catch (\Throwable $e) {
+            Log::error('Onboarding: falha ao enviar email', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
         }
     }
 

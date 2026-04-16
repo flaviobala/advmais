@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\PaymentController;
 use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\GuestCheckoutController;
 use App\Http\Controllers\Web\PasswordResetController;
+use App\Http\Controllers\OnboardingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,11 @@ Route::get('/esqueci-senha', [PasswordResetController::class, 'showForgotForm'])
 Route::post('/esqueci-senha', [PasswordResetController::class, 'sendResetLink'])->name('password.send');
 Route::get('/redefinir-senha/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
 Route::post('/redefinir-senha', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+
+// ─── ONBOARDING DE MEMBROS (público via token) ───────────────────────────────
+Route::get('/onboarding/{token}', [OnboardingController::class, 'form'])->name('onboarding.form');
+Route::post('/onboarding/{token}', [OnboardingController::class, 'submit'])->name('onboarding.submit');
+Route::get('/onboarding/{token}/sucesso', [OnboardingController::class, 'success'])->name('onboarding.success');
 
 // ─── CHECKOUT PÚBLICO (sem login) ────────────────────────────────────────────
 Route::get('/comecar', [GuestCheckoutController::class, 'show'])->name('guest.checkout.show');

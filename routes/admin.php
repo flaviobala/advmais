@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UserCategoryController;
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\UserCourseController;
 use App\Http\Controllers\Admin\VoucherController;
+use App\Http\Controllers\Admin\OnboardingController;
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
@@ -46,6 +47,15 @@ Route::prefix('admin')
         Route::get('materials', fn () => redirect()->route('admin.courses.index'))->name('materials.index');
         Route::post('materials', [MaterialController::class, 'store'])->name('materials.store');
         Route::delete('materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+
+        // Onboarding de membros (admin + acesso geral)
+        Route::get('onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
+        Route::get('onboarding/settings', [OnboardingController::class, 'settingsForm'])->name('onboarding.settings');
+        Route::post('onboarding/settings', [OnboardingController::class, 'settingsSave'])->name('onboarding.settings.save');
+        Route::get('onboarding/{onboarding}', [OnboardingController::class, 'show'])->name('onboarding.show');
+        Route::post('onboarding/{onboarding}/approve', [OnboardingController::class, 'approve'])->name('onboarding.approve');
+        Route::post('onboarding/{onboarding}/resend', [OnboardingController::class, 'resend'])->name('onboarding.resend');
+        Route::get('onboarding/{onboarding}/preview-pdf', [OnboardingController::class, 'previewPdf'])->name('onboarding.preview-pdf');
 
         // Rotas restritas a admin
         Route::middleware('admin-only')->group(function () {

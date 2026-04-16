@@ -141,7 +141,7 @@
             </p>
             <p class="mt-2 text-center text-xs text-gray-600">
                 Desenvolvido por
-                <a href="https://wa.me/5582999730532"
+                <a href="https://wa.me/5582993678371"
                    target="_blank"
                    rel="noopener"
                    class="text-gray-500 hover:text-yellow-500 transition-colors duration-200 no-underline">

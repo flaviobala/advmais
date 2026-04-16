@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMemberMail;
+use App\Models\MemberOnboarding;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
@@ -10,6 +12,9 @@ use App\Models\Voucher;
 use App\Services\AsaasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class GuestCheckoutController extends Controller
 {
@@ -111,6 +116,8 @@ class GuestCheckoutController extends Controller
 
             $voucher?->incrementUsage();
 
+            $this->sendOnboardingEmail($user);
+
             Auth::login($user);
             $request->session()->regenerate();
 
@@ -175,6 +182,25 @@ class GuestCheckoutController extends Controller
 
             return back()->withInput()
                 ->withErrors(['error' => 'Erro ao processar pagamento: ' . $e->getMessage()]);
+        }
+    }
+
+    private function sendOnboardingEmail(User $user): void
+    {
+        try {
+            $onboarding = MemberOnboarding::firstOrCreate(
+                ['user_id' => $user->id],
+                ['token' => Str::random(64), 'status' => 'pending']
+            );
+
+            Mail::to($user->email)->send(new WelcomeMemberMail($user, $onboarding));
+
+            $onboarding->update(['welcome_sent_at' => now()]);
+        } catch (\Throwable $e) {
+            Log::error('Onboarding: falha ao enviar email de boas-vindas', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
         }
     }
 

@@ -54,6 +54,14 @@
             </a>
             @endif
 
+            <a href="{{ route('admin.onboarding.index') }}"
+               class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.onboarding.*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                <svg class="mr-3 h-6 w-6 {{ request()->routeIs('admin.onboarding.*') ? 'text-blue-400' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Integração de Membros
+            </a>
+
             <a href="{{ route('admin.courses.index') }}"
                class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.courses.*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                 <svg class="mr-3 h-6 w-6 {{ request()->routeIs('admin.courses.*') ? 'text-blue-400' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
